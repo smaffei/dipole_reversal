@@ -9,7 +9,7 @@
 - instantaneous_flows (original study by Sam/Phil)
   - original code (original fortran code files provided by Phil)
   - modified code (modified fortran code to be called by python)
-  - dipole_bound.py (module containing required functions)
+  - functions.py (module containing required functions)
   - igrf.ipynb (IGRF analysis)
   - immab4.iypnb (IMMAB4 analysis)
   - IMM_roc.txt (data file from analysis output)
@@ -32,4 +32,10 @@ To setup the python environment:
 3. Finally add the kernel to those available to jupyter notebooks with `python -m ipykernel install --user --name dipole_reversal --display-name "Python (dipole_reversal)"`
 4. The jupyter notebooks can now be run with `jupyter notebook` (you may need to select the kernel you have just installed)
 
+##### foe-linux users
+You may find that an old (and bugged) version of cartopy exists in your python path (it loaded into mine automatically). In `instantaneous_flows/functions.py`
+edit the line:
+`sys.path.insert(0,'~/anaconda3/envs/dipole_reversal/lib/python3.7/site-packages')`
+changing the path to to location of your anaconda environments if not at the above path. This ensures the correct paths are
+searched first.
 -----
