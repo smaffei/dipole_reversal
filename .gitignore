@@ -6,4 +6,5 @@ instantaneous_flows/modified_code/dipole_bound
 instantaneous_flows/original_code/*.o
 instantaneous_flows/original_code/*.mod
 instantaneous_flows/original_code/dipole_bound
+instantaneous_flows/code_output
 
