@@ -39,4 +39,5 @@ edit the line:
 `sys.path.insert(0,'~/anaconda3/envs/dipole_reversal/lib/python3.7/site-packages')`
 changing the path to to location of your anaconda environments if not at the above path. This ensures the correct paths are
 searched first.
+
 -----
