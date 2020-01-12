@@ -3,7 +3,7 @@
 ### Contents
 - Models (all spherical harmonic models used)
   - IGRF
-  - IMM
+  - IMMAB4
   - CHAOS5
   - CALS10K1B
 - instantaneous_flows (original study by Sam/Phil)
