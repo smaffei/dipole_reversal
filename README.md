@@ -12,6 +12,8 @@
   - dipole_bound.py (module containing required functions)
   - igrf.ipynb (IGRF analysis)
   - imm.iypnb (IMM analysis)
+  - IMM_roc.txt (data file from analysis output)
+  - IMM_roc_ex.txt (data file from analysis output)
   
 -----
 
