@@ -162,7 +162,7 @@ def read_BR(directory='code_output/'):
     Br_dot = Br_dot_data[:,2].reshape(shape)
 
 
-    Br_data = np.genfromtxt(files[1])
+    Br_data = np.genfromtxt(directory+files[1])
     Br = Br_data[:,2].reshape(shape)
 
 
