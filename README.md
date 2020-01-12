@@ -11,7 +11,7 @@
   - modified code (modified fortran code to be called by python)
   - dipole_bound.py (module containing required functions)
   - igrf.ipynb (IGRF analysis)
-  - imm.iypnb (IMM analysis)
+  - immab4.iypnb (IMMAB4 analysis)
   - IMM_roc.txt (data file from analysis output)
   - IMM_roc_ex.txt (data file from analysis output)
   
