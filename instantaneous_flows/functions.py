@@ -1,5 +1,5 @@
 import sys
-sys.path.insert(0,'/nfs/see-fs-01_teaching/ee12sg/anaconda3/envs/dipole_reversal/lib/python3.7/site-packages')
+sys.path.insert(0,'~/anaconda3/envs/dipole_reversal/lib/python3.7/site-packages')
 import os
 import subprocess
 import numpy as np
