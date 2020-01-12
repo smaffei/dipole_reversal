@@ -24,6 +24,6 @@ Flows are optimised for the instantaneous Rate Of Change (ROC) of the axial dipo
 To compile the fortran code:
 1. First navigate to `instantaneous_flows/modified_code` and change the path to the fftw3 library within the Makefile to your own location, then run the Makefile with `make`.
 2. To create the conda environment for the python code, run `conda env create -f environment.yml` from within `instantaneous_flows`
-3. Activate the conda environment with `source activate dipole_reversal'
+3. Activate the conda environment with `source activate dipole_reversal`
 4. Finally add the kernel to those available to jupyter notebooks with `python -m ipykernel install --user --name dipole_reversal --display-name "Python (dipole_reversal)"`
 5. The jupyter notebooks can now be run with `jupyter notebook` (you may need to select the kernel you have just installed)
