@@ -127,6 +127,11 @@ def dipole_bound(lmax_u, lmax_B, gauss_coeffs, target_rms, toroidal_only=False, 
     return dipole_rate, pol_ke, tor_ke
 
 def write_input_file(lmax_u, lmax_B_obs, target_rms, restriction, save_flag, filename_gauss):
+
+    """
+    Writes an input file for the dipole_bound_modified.F90 program to read
+    """
+
     inputs = [lmax_u,lmax_B_obs,target_rms,restriction,save_flag]
 
     filename = 'temporary_input_file.txt'
@@ -139,43 +144,51 @@ def write_input_file(lmax_u, lmax_B_obs, target_rms, restriction, save_flag, fil
     return filename
 
 def write_gauss_coeffs(harmonics, gauss_coeffs):
+
+    """
+    Writes a file containing the gaussian coefficients of a magnetic field model for the
+    dipole_bound_modified.F90 program to read
+    """
+
     filename='temp_file_gauss.txt'
     np.savetxt(filename, np.hstack([harmonics,gauss_coeffs]), fmt=('%d','%d','%.5e','%.5e'), delimiter='\t', header='Gauss Coefficients')
     return filename
 
-def read_BR(directory='code_output/'):
+def read_BR_dot(directory='code_output/'):
 
-    files = ['BR_DOT_ES.DAT', 'BR_ES.DAT']
+    """
+    Reads the Br_dot values from the output file created by dipole_bound.F90.
+    Returns the locations, LONS/LATS, and the values Br_dot as 2D arrays.
 
-    Br_dot_data = np.genfromtxt(directory+files[0])
+    filename is hardcoded but its location can be specified by the 'directory' keyword.
+    Default is the code_output folder created by dipole_bound() if save_files=True.
+    """
+
+    file = 'BR_DOT_ES.DAT'
+
+    Br_dot_data = np.genfromtxt(directory+file)
 
     lats = np.unique(Br_dot_data[:,1])[::-1]
     lons = np.unique(Br_dot_data[:,0])[::-1]-180
 
     LATS, LONS = np.meshgrid(lats,lons)
 
-    a = lons.size
-    b = lats.size
-
-    shape = (a,b)
-
-    Br_dot = Br_dot_data[:,2].reshape(shape)
-
-
-    Br_data = np.genfromtxt(directory+files[1])
-    Br = Br_data[:,2].reshape(shape)
-
-
     #copy data at longitude = 180 to -180
     LONS = np.vstack((LONS[-1,:]+360,LONS))
     LATS = np.vstack((LATS[-1,:],LATS))
-    Br = np.vstack((Br[-1,:],Br))
     Br_dot = np.vstack((Br_dot[-1,:],Br_dot))
 
-
-    return LONS,LATS,Br,Br_dot
+    return LONS,LATS,Br_dot
 
 def read_vectors(directory='code_output/'):
+
+    """
+    Reads the flow vectors from the output file created by dipole_bound.F90.
+    Returns the locations, LONS/LATS, and the vector components, u/v, as 2D arrays.
+
+    filename is hardcoded but its location can be specified by the 'directory' keyword.
+    Default is the code_output folder created by dipole_bound() if save_files=True.
+    """
 
     file = 'FLOW_VECTORS_CENTRED.DAT'
 
@@ -197,6 +210,10 @@ def read_vectors(directory='code_output/'):
 
 def setup_map_figure(*args,figsize=(10,4),**kwargs):
 
+    """
+    Creates the map axes for the global map figures
+    """
+
     #Set up figure
     plt.figure(*args,figsize=figsize,**kwargs)
 
@@ -210,6 +227,10 @@ def setup_map_figure(*args,figsize=(10,4),**kwargs):
     return ax
 
 def plot_vectors(ax,lats,lons,u,v, linewidth=2, *args, **kwargs):
+
+    """
+    Plots vector field onto the global map axes created by setup_map_figure
+    """
 
     speed = np.sqrt(u**2 + v**2)
     lw = linewidth*speed/np.max(speed)
@@ -226,6 +247,10 @@ def plot_vectors(ax,lats,lons,u,v, linewidth=2, *args, **kwargs):
 
 def plot_contourf(ax,lats,lons,values,*args,**kwargs):
 
+    """
+    Plots filled contours onto the global map axes created by setup_map_figure
+    """
+
     im = ax.contourf(lons,lats,values,*args,transform=ccrs.PlateCarree(),**kwargs)
     cbar = plt.colorbar(im)
     ax.coastlines()
@@ -233,6 +258,30 @@ def plot_contourf(ax,lats,lons,values,*args,**kwargs):
     return im, cbar
 
 def power_spectra(lmax,gauss_coeffs):
+
+    """
+    Calculates the Lowes power spectrum of a geomagnetic field model
+
+    Parameters
+    ----------
+        'lmax' : int.
+            Maximum spherical harmonic degree, l, of the input magnetic field.
+        'gauss_coeffs' : numpy array.
+            Array of gauss coefficients for magnetic field. Must be a 2D array
+            with columns relating to the sin and cosine terms in the format:
+                g10 (sin), h10 (cosine)
+                g11 (sin), h11 (cosine)
+                g20 (sin), h20 (cosine)
+                g21 (sin), h21 (cosine)
+                etc...
+
+    Returns
+    ---------
+
+        R (numpy array)
+            Array containing the power spectrum value at each degree up to lmax
+
+    """
 
     R = np.zeros(lmax)
     c = 0
@@ -244,6 +293,36 @@ def power_spectra(lmax,gauss_coeffs):
     return R
 
 def extrapolate_model(lmax,lmax_new,gauss_coeffs):
+
+    """
+    Extrapolates a geomagnetic field model from degree lmax to lmax_new. Additional gaussian
+    coefficients used are random in both their amplitude and sign and fit a linear line
+    in the log of their power spectrum. The slope of the power spectrum is that same as the
+    best fit slope of the model up to degree lmax. All coefficients from degree 1 to lmax_new
+    are scaled to match the total power of the input model.
+
+    Parameters
+    ----------
+        'lmax' : int.
+            Maximum spherical harmonic degree, l, of the input magnetic field.
+        'lmax_new' : int.
+            Spherical harmonic degree, l, to extrapolate the magnetic field out to.
+        'gauss_coeffs' : numpy array.
+            Array of gauss coefficients for magnetic field. Must be a 2D array
+            with columns relating to the sin and cosine terms in the format:
+                g10 (sin), h10 (cosine)
+                g11 (sin), h11 (cosine)
+                g20 (sin), h20 (cosine)
+                g21 (sin), h21 (cosine)
+                etc...
+
+    Returns
+    ---------
+
+        coeffs_ex (numpy array)
+            Array containing the gaussian coefficients of the extrapolated model.
+
+    """
 
     # Current spectra
     R = power_spectra(lmax,gauss_coeffs)
@@ -279,6 +358,37 @@ def extrapolate_model(lmax,lmax_new,gauss_coeffs):
     return coeffs_ex
 
 def evaluate_B(gauss_coeffs, lat, lon):
+
+    """
+    Evaluates the magnetic field vector, B, for a given input model at a specific location.
+
+    Parameters
+    ----------
+        'gauss_coeffs' : numpy array.
+            Array of gauss coefficients for magnetic field. Must be a 2D array
+            with columns relating to the sin and cosine terms in the format:
+                g10 (sin), h10 (cosine)
+                g11 (sin), h11 (cosine)
+                g20 (sin), h20 (cosine)
+                g21 (sin), h21 (cosine)
+                etc...
+
+        'lat' : int, float, list, numpy array
+            Latitudes at which to evaluate B. Must be between 90 and -90 exclusively.
+
+        'lon' : int, float, list, numpy array
+            Longitudes at which to evaluate B. Must be between 0 and 360 inclusively.
+
+    Returns
+    ---------
+
+        Br, Bth, Bph
+            Arrays containing the components of the vector field B in spherical coordinates
+            (radius, theta, phi). If more than 1 value is specified for both lat and lon, then
+            each component will be a 2D array where the values correspond to a grid of these 
+            latitudes and longitudes.
+
+    """
 
     if not type(lat) == np.ndarray:
         lat = np.array([lat])
