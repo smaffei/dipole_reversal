@@ -34,7 +34,7 @@ To setup the python environment:
 
 #### foe-linux users
 
-You may find that an old (and bugged) version of cartopy exists in your python path (it loaded into mine automatically). In `instantaneous_flows/functions.py`
+You may find that an old (and bugged) version of cartopy exists in your python path (it loaded into mine automatically) and get an import error message when creating the maps. In `instantaneous_flows/functions.py`
 edit the line:
 `sys.path.insert(0,'~/anaconda3/envs/dipole_reversal/lib/python3.7/site-packages')`
 changing the path to the location of your anaconda environments if not at the above path. This ensures the correct paths are
