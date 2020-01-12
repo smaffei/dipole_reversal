@@ -29,3 +29,5 @@ To setup the python environment:
 2. Activate the conda environment with `source activate dipole_reversal`
 3. Finally add the kernel to those available to jupyter notebooks with `python -m ipykernel install --user --name dipole_reversal --display-name "Python (dipole_reversal)"`
 4. The jupyter notebooks can now be run with `jupyter notebook` (you may need to select the kernel you have just installed)
+
+-----
