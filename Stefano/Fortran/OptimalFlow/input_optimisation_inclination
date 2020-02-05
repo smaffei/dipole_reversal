@@ -1,0 +1,9 @@
+36.1992 358.451   !colatitude; 52N latitude = 38 colatitude
+25   !LMAX U
+14   !LMAX_B_OBS
+"/nfs/see-fs-01_users/earsmaf/geomag/models/CHAOS-6-x9/CHAOS-6-x9_core_2019.0007_axial_dipole.dat" ! CHAOS6 model file
+13   !target rms
+5e-2 !scale factor for arrows : 20km/yr gives 1cm (factor of 1/20 = 5e-2)
+0  ! RESTRICTION OF FLOW? 0: NONE, 1: POL ONLY, 2: TOR ONLY, 3: COLUMNAR
+0 ! eta
+5 ! flag to decide the quantity to be optimised. 0: dipole tilt, 1: intensity at location, 2: intensity rate of change at intensity minimum (SAA), 3: declination at location, 4: g10, 5: inclination at location

@@ -1,0 +1,6 @@
+F90 = ifort # gfortran -ffree-line-length-0
+dipole_tilt_bound :  dipole_tilt_bound.F90 subs.F90 optimisation_bound.F90
+	$(F90) -c   subs.F90
+	$(F90) -c   optimisation_bound.F90
+	$(F90) -o dipole_tilt_bound dipole_tilt_bound.F90 subs.o optimisation_bound.o -lfftw3 
+    

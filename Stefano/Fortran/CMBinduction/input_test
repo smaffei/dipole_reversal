@@ -1,0 +1,10 @@
+25     ! LMAX_U 
+13     ! LMAX_B
+"/nfs/see-fs-01_users/earsmaf/SWIGS/OptimalFlow/CHAOS6_2019.0007_max_Leeds_inclination/OPTIMAL_FLOW.DAT"    ! flow file 
+"/nfs/see-fs-01_users/earsmaf/geomag/models/CHAOS-6-x9/CHAOS-6-x9_core_2019.0007.dat" ! magnetic field file
+0.7    ! Magnetic diffusivity (in m^2/s)
+0.6    ! Diffusion timestepping parameter (1/2 for C-N, 0 for Euler)
+2019.0007 ! Initial time (year)
+2021.0007 ! Final time (year)
+1    ! Timestep (in yr)
+0      ! reverse flow flag: 0 = NO, 1 = YES

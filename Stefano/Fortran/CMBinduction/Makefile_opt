@@ -1,0 +1,5 @@
+F90 = ifort -g -traceback #-CB -debug all # gfortran -ffree-line-length-0
+timestepping_induction_opt :  timestepping_induction_opt.F90 /nfs/see-fs-01_users/earsmaf/SWIGS/OptimalFlow/subs.F90 /nfs/see-fs-01_users/earsmaf/SWIGS/OptimalFlow/optimisation_bound.F90
+	$(F90) -c   /nfs/see-fs-01_users/earsmaf/SWIGS/OptimalFlow/subs.F90
+	$(F90) -c   /nfs/see-fs-01_users/earsmaf/SWIGS/OptimalFlow/optimisation_bound.F90
+	$(F90) -o timestepping_induction_opt timestepping_induction_opt.F90 subs.o optimisation_bound.o -lfftw3 

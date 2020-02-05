@@ -1,0 +1,17 @@
+25     ! LMAX_U 
+13     ! LMAX_B
+"/nfs/see-fs-01_users/earsmaf/SWIGS/OptimalFlow/CHAOS6_2019.0007_max_Leeds_inclination/OPTIMAL_FLOW.DAT"    ! flow file
+"/nfs/see-fs-01_users/earsmaf/geomag/models/CHAOS-6-x9/CHAOS-6-x9_core_2019.0007.dat" ! magnetic field file
+1      ! FLOW INITIAL CONDITION? (0: FROM FILE; 1: OPTIMAL FLOW)
+0.0    ! Magnetic diffusivity (in m^2/s)
+0.6    ! Diffusion timestepping parameter (1/2 for C-N, 0 for Euler)
+2019.0007 ! Initial time (year)
+2019.0037 ! Final time (year)
+0.001    ! Timestep (in yr)
+1      ! reverse flow flag: 0 = NO, 1 = YES
+36.1992 358.451   !colatitude; 52N latitude = 38 colatitude
+13   !target rms
+5e-2 !scale factor for arrows : 20km/yr gives 1cm (factor of 1/20 = 5e-2)
+0  ! RESTRICTION OF FLOW? 0: NONE, 1: POL ONLY, 2: TOR ONLY, 3: COLUMNAR
+5 ! flag to decide the quantity to be optimised. 0: dipole tilt, 1: intensity at location, 2: intensity rate of change at intensity minimum (SAA), 3: declination at location
+1 ! output rate

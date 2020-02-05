@@ -216,8 +216,12 @@ for it in range(n_instants):
 
 ########################################
 # Read in Sagnotti's 2014 data
+# from the supplementary material
+# Depth has been converted to age by fixing 
+# the age of the SUl2-16 and SUL2-22 
+# layers from figure 4
 ########################################
-SUL_folder = '/nfs/see-fs-01_users/earsmaf/geomag/datasets/Sagnotti_2014/'
+SUL_folder = '../datasets/Sagnotti_2014/'
 data_S1_file = SUL_folder + 'Sagnotti_et_al_Table_S1_rock_mag_pmag.csv'
 
 data_S1 = []
@@ -267,6 +271,39 @@ Decl_SUL  = Decl_S1[26:171]
 dep_rate  = (depth_SUL2_22 - depth_SUL2_16) / (time_SUL2_22 - time_SUL2_16)
 t0        = time_SUL2_16 - depth_SUL2_16/dep_rate
 time_SUL  = depth_SUL/dep_rate + t0
+
+
+
+########################################
+# Read in Sagnotti's 2015 data
+# taken from reading in figure 13 with WebPlootDigitizer
+########################################
+SUL_2015_folder = '../datasets/Sagnotti_2015/'
+data_2015_file = SUL_2015_folder + '2015.csv'
+
+data_2015 = []
+time_2015 = []
+Incl_2015 = []
+with open(data_2015_file) as f1:
+    readCSV = csv.reader(f1,delimiter=',')
+    for row in readCSV:
+        data_2015.append(row)
+        # get time stamp of data point
+        try:
+            time1 = float(row[0])
+        except:
+            # not a string: probably still in the header
+            continue
+        time_2015 = np.append(time_2015,time1)
+        # get inclination data point
+        try:
+            incl = float(row[1])
+        except:
+            incl = np.nan
+            
+        Incl_2015 = np.append(Incl_2015,incl)
+
+f1.close()
 
 #######
 #######
@@ -494,7 +531,7 @@ ax_twin.plot([times[twrite], times[twrite]],[0, 40],'--',color='gray')
 ax_twin.plot([times[tend], times[tend]],[0, 40],'--',color='gray')
 ax_twin.set_ylim(0, 40)
 
-ax.set_xlabel('Time')
+ax.set_xlabel('Time / kyr')
 ax.set_ylabel('Dipole latitude/$^\circ$',color='b')
 
 ax.plot(times,dipole_colatitude,color='b')
@@ -515,6 +552,8 @@ fig_i,ax_i =  plt.subplots(figsize=(8,5))
 ax_i.plot([times[twrite], times[twrite]],[-40, 40],'--',color='gray')
 ax_i.plot([times[tend], times[tend]],[-40, 40],'--',color='gray')
 ax_i.set_ylim(-40, 40)
+plt.xlabel('Time / kyr')
+plt.ylabel('g10 / mT')
 
 ax_i.plot(times,g10,color='b')
 ax_i.set_xlim(times[0], times[-1])
@@ -540,7 +579,8 @@ ax_i.plot(times,inclination_locations[:,0],color='b',
           label='Quito'  )
 ax_i.plot(times,inclination_locations[:,2],color='g',
           label='Sidney'  )
-
+plt.xlabel('Time / kyr')
+plt.ylabel('Inclination / $^\circ$')
 ax_i.set_xlim(times[0], times[-1])
 ax_i.legend(fontsize=10,loc='upper left')
 plt.title('Inclination at locations')
@@ -564,9 +604,10 @@ ax_i.plot(times,inclination_locations[:,1],color='r',
 ax_i.plot(time_SUL,Incl_SUL,'--',color='r',
           label='Sagnotti et al., 2014'  )
 
-ax_i.plot(time_SUL-13.95,Incl_SUL,'--',color='c',
-          label='Sagnotti et al., 2014 (shifted)'  )
-
+ax_i.plot(time_2015,Incl_2015,'.',color='c',
+          label='Sagnotti et al., 2015'  )
+plt.xlabel('Time / kyr')
+plt.ylabel('Inclination / $^\circ$')
 ax_i.set_xlim(times[0], times[-1])
 ax_i.legend(fontsize=10,loc='bottom right')
 plt.title('Inclination at SUL')

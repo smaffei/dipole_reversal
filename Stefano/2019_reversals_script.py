@@ -556,8 +556,8 @@ theta_ddot_1 = -( md/H1 )*( g10dot*md**2 - g10*(g10*g10dot+g11*g11dot+h11*h11dot
 
 ETA     = 0.7
 ALPHA   = 0.6
-T0      = 2019.007
-TF      = 2219.007
+T0      = 2019.0007
+TF      = 2219.0007
 DT      = 1
 
 folder_timestep = 'CHAOS6_2019.0007_max_g10_timestep_dt1'
@@ -598,6 +598,37 @@ if MF_file == []:
 # load MF coefficients
 coeffs_MF_1_evolved_opt = subs.read_MF_file(folder_timestep+'/MF_COEFFS.DAT')
 times_1_ev_opt = coeffs_MF_1_evolved_opt[:,0]
+
+
+################################################################
+# OPTIMAL REVERSAL TIMES:
+# Optimal g10 from 2019 CHAOS model, timestepping/opt, no diffusion
+################################################################
+
+folder_timestep = 'CHAOS6_2019.0007_max_g10_timestep_opt_dt1_eta0'
+
+FLAG_U_INIT     = 1
+OUT_RATE        = 1
+ETA             = 0
+#prepare the input file
+subs.write_timesteping_opt_input("input_timestepping_CMB_opt",LMAX_U,LMAX_B_OBS,FLOW,MODEL,FLAG_U_INIT,ETA,ALPHA,T0,TF,DT,REVERSE,colat_SUL,lon_SUL,TARGET_RMS,SCALE_FACTOR,RESTRICTION,FLAG,OUT_RATE)
+# this could be a long run, let's skip it if we find the MF file
+MF_file = []
+try:
+    MF_file = np.loadtxt(folder_timestep+'/MF_COEFFS.DAT')
+except:
+    print('no MF file found')
+    
+if MF_file == []:
+    # run the timestepping fortran code
+    os.system('./timestepping_induction_opt < input_timestepping_CMB_opt')
+    os.system('mkdir '+folder_timestep)
+    os.system('mv *DAT '+folder_timestep)
+    
+# load MF coefficients
+coeffs_MF_1_evolved_opt_eta0 = subs.read_MF_file(folder_timestep+'/MF_COEFFS.DAT')
+times_1_ev_opt_eta0 = coeffs_MF_1_evolved_opt_eta0[:,0]
+
 
 ############################################
 # OPTIMAL REVERSAL TIMES:
@@ -650,8 +681,8 @@ theta_ddot_2 = -( md/H1 )*( g10dot*md**2 - g10*(g10*g10dot+g11*g11dot+h11*h11dot
 
 ETA     = 0.7
 ALPHA   = 0.6
-T0      = 2019.007
-TF      = 2219.007
+T0      = 2019.0007
+TF      = 2219.0007
 DT      = 1
 
 folder_timestep = 'CHAOS6_2019.0007_max_dipolte_tilt_timestep_dt1'
@@ -695,6 +726,7 @@ if MF_file == []:
     os.system('mv *DAT '+folder_timestep)
     
 coeffs_MF_2_evolved_opt = subs.read_MF_file(folder_timestep+'/MF_COEFFS.DAT')
+coeffs_SV_2_evolved_opt = subs.read_MF_file(folder_timestep+'/SV_COEFFS.DAT')
 times_2_ev_opt = coeffs_MF_2_evolved_opt[:,0]
 g10   = coeffs_MF_2_evolved_opt[:,1]
 g11   = coeffs_MF_2_evolved_opt[:,2]
@@ -702,6 +734,182 @@ h11   = coeffs_MF_2_evolved_opt[:,3]
 md    = np.sqrt(np.square(g10) + np.square(g11) + np.square(h11))
 colatitude_2_ev_opt = -(90.0 - 180/np.pi * np.arccos(np.divide(g10,md)))
 dipole_lon_2_ev_opt =  180/np.pi * np.arctan(np.divide(g11,h11)) 
+
+
+################################################################
+# OPTIMAL REVERSAL TIMES:
+# Optimal dipole tilt from 2019 CHAOS model, timestepping/opt, no diffusion
+################################################################
+
+folder_timestep = 'CHAOS6_2019.0007_max_dipole_tilt_timestep_opt_dt1_eta0'
+
+FLAG_U_INIT     = 1
+OUT_RATE        = 1
+ETA             = 0
+#prepare the input file
+subs.write_timesteping_opt_input("input_timestepping_CMB_opt",LMAX_U,LMAX_B_OBS,FLOW,MODEL,FLAG_U_INIT,ETA,ALPHA,T0,TF,DT,REVERSE,colat_SUL,lon_SUL,TARGET_RMS,SCALE_FACTOR,RESTRICTION,FLAG,OUT_RATE)
+# this could be a long run, let's skip it if we find the MF file
+MF_file = []
+try:
+    MF_file = np.loadtxt(folder_timestep+'/MF_COEFFS.DAT')
+except:
+    print('no MF file found')
+    
+if MF_file == []:
+    # run the timestepping fortran code
+    os.system('./timestepping_induction_opt < input_timestepping_CMB_opt')
+    os.system('mkdir '+folder_timestep)
+    os.system('mv *DAT '+folder_timestep)
+
+# load MF coefficients
+coeffs_MF_2_evolved_opt_eta0 = subs.read_MF_file(folder_timestep+'/MF_COEFFS.DAT')
+coeffs_SV_2_evolved_opt_eta0 = subs.read_MF_file(folder_timestep+'/SV_COEFFS.DAT')
+times_2_ev_opt_eta0 = coeffs_MF_2_evolved_opt_eta0[:,0]
+
+
+############################################
+# OPTIMAL REVERSAL TIMES:
+# Optimal inclination from 2019 CHAOS model
+###########################################
+
+ETA         = 0
+FLAG         = 5
+ 
+folder_test = 'CHAOS6_2019.0007_max_Leeds_inclination'
+# prepare the input file
+subs.write_optimal_flow_input("input_opt",colat_Leeds,lon_Leeds,LMAX_U,LMAX_B_OBS,MODEL,TARGET_RMS,SCALE_FACTOR,RESTRICTION,ETA,FLAG)
+# run the fortran code
+os.system('./dipole_tilt_bound < input_opt')
+os.system('mkdir '+folder_test)
+os.system('mv *DAT '+folder_test)
+
+# plot the flow
+subs.show_flow(folder_test+"/")
+subs.show_flow_global(folder_test+"/")
+
+# calculte all SV coefficients
+FLOW = folder_test+'/OPTIMAL_FLOW.DAT'
+REVERSE = 1
+
+subs.write_calc_SV_input('input_calc_SV',LMAX_U,LMAX_B_OBS,FLOW,MODEL,REVERSE)
+os.system('./calc_SV < input_calc_SV')
+os.system('mv *DAT '+folder_test)
+
+# these coefficients are in nT/yr
+coeffs_SV_3_inst = subs.read_coeffs(folder_test+'/SV.DAT',0,LMAX_B_OBS+LMAX_U)
+
+Br_a, Bt_a, Bp_a=SH_library.calcB(coeffsB_CHAOS_2019,np.array([colat_Leeds*np.pi/180.0]),np.array([lon_Leeds*np.pi/180.0]),r_a,r_a)
+incl_init = np.arctan(np.divide(-Br_a,np.sqrt(Bt_a**2 + Bp_a**2)))*180/np.pi
+
+# read in the optimal inclination
+fincl = open(folder_test+'/OPTIMISED_QUANTITY_DOT.DAT', 'r')
+line = fincl.readline()
+line = fincl.readline()
+fincl.close()
+
+incl_dot = float(line) * 180.0/np.pi
+
+
+################################################################
+# OPTIMAL REVERSAL TIMES:
+# Optimal inclination from 2019 CHAOS model, timestepping induction eq.
+################################################################
+
+ETA     = 0.7
+ALPHA   = 0.6
+T0      = 2019.0007
+TF      = 2219.0007
+DT      = 1
+REVERSE = 1
+
+folder_timestep = 'CHAOS6_2019.0007_max_Leeds_inclination_timestep_dt1'
+# prepare the input file
+subs.write_timesteping_input("input_timestepping_CMB",LMAX_U,LMAX_B_OBS,FLOW,MODEL,ETA,ALPHA,T0,TF,DT,REVERSE)
+# run the timestepping fortran code
+os.system('./timestepping_induction < input_timestepping_CMB')
+os.system('mkdir '+folder_timestep)
+os.system('mv *DAT '+folder_timestep)
+
+coeffs_MF_3_evolved = subs.read_MF_file(folder_timestep+'/MF_COEFFS.DAT')
+times_3_ev = coeffs_MF_3_evolved[:,0]
+
+incl_ev = np.zeros(times_3_ev.shape)
+# calculate inclination time-series
+for it in range(coeffs_MF_3_evolved.shape[0]):
+    coeffsB = coeffs_MF_3_evolved[it,1:]
+    beta = SH_library.lin2matCoeffs(coeffsB)
+    Br_a, Bt_a, Bp_a=SH_library.calcB(beta,np.array([colat_Leeds*np.pi/180.0]),np.array([lon_Leeds*np.pi/180.0]),r_a,r_a)
+    incl_ev[it] = np.arctan(np.divide(-Br_a,np.sqrt(Bt_a**2 + Bp_a**2)))*180/np.pi
+ 
+ 
+################################################################
+# OPTIMAL REVERSAL TIMES:
+# Optimal inclination from 2019 CHAOS model, timestepping/opt 
+################################################################
+
+folder_timestep = 'CHAOS6_2019.0007_max_Leeds_inclination_timestep_opt_dt1'
+REVERSE         = 1
+FLAG_U_INIT     = 1 # start this integration from the previously calculated initial condition
+
+#prepare the input file
+subs.write_timesteping_opt_input("input_timestepping_CMB_opt",LMAX_U,LMAX_B_OBS,FLOW,MODEL,FLAG_U_INIT,ETA,ALPHA,T0,TF,DT,REVERSE,colat_Leeds,lon_Leeds,TARGET_RMS,SCALE_FACTOR,RESTRICTION,FLAG,OUT_RATE)
+# this could be a long run, let's skip it if we find the MF file
+MF_file = []
+try:
+    MF_file = np.loadtxt(folder_timestep+'/MF_COEFFS.DAT')
+except:
+    print('no MF file found')
+    
+if MF_file == []:
+    # run the timestepping fortran code
+    os.system('./timestepping_induction_opt < input_timestepping_CMB_opt')
+    os.system('mkdir '+folder_timestep)
+    os.system('mv *DAT '+folder_timestep)
+    
+coeffs_MF_3_evolved_opt = subs.read_MF_file(folder_timestep+'/MF_COEFFS.DAT')
+coeffs_SV_3_evolved_opt = subs.read_MF_file(folder_timestep+'/SV_COEFFS.DAT')
+times_3_ev_opt = coeffs_MF_3_evolved_opt[:,0]
+
+
+incl_ev_opt = np.zeros(times_3_ev_opt.shape)
+# calculate inclination time-series
+for it in range(coeffs_MF_3_evolved_opt.shape[0]):
+    coeffsB = coeffs_MF_3_evolved_opt[it,1:]
+    beta = SH_library.lin2matCoeffs(coeffsB)
+    Br_a, Bt_a, Bp_a=SH_library.calcB(beta,np.array([colat_Leeds*np.pi/180.0]),np.array([lon_Leeds*np.pi/180.0]),r_a,r_a)
+    incl_ev_opt[it] = np.arctan(np.divide(-Br_a,np.sqrt(Bt_a**2 + Bp_a**2)))*180/np.pi
+    
+################################################################
+# OPTIMAL REVERSAL TIMES:
+# Optimal inclination from 2019 CHAOS model, timestepping/opt, no diffusion
+################################################################
+
+folder_timestep = 'CHAOS6_2019.0007_max_Leeds_inclination_timestep_opt_dt1_eta0'
+
+FLAG_U_INIT     = 1
+OUT_RATE        = 1
+ETA             = 0
+REVERSE         = 0
+
+#prepare the input file
+subs.write_timesteping_opt_input("input_timestepping_CMB_opt",LMAX_U,LMAX_B_OBS,FLOW,MODEL,FLAG_U_INIT,ETA,ALPHA,T0,TF,DT,REVERSE,colat_Leeds,lon_Leeds,TARGET_RMS,SCALE_FACTOR,RESTRICTION,FLAG,OUT_RATE)
+# this could be a long run, let's skip it if we find the MF file
+MF_file = []
+try:
+    MF_file = np.loadtxt(folder_timestep+'/MF_COEFFS.DAT')
+except:
+    print('no MF file found')
+    
+if MF_file == []:
+    # run the timestepping fortran code
+    os.system('./timestepping_induction_opt < input_timestepping_CMB_opt')
+    os.system('mkdir '+folder_timestep)
+    os.system('mv *DAT '+folder_timestep)
+
+# load MF coefficients
+coeffs_MF_3_evolved_opt_eta0 = subs.read_MF_file(folder_timestep+'/MF_COEFFS.DAT')
+coeffs_SV_3_evolved_opt_eta0 = subs.read_MF_file(folder_timestep+'/SV_COEFFS.DAT')
+times_3_ev_opt_eta0 = coeffs_MF_3_evolved_opt_eta0[:,0]
 
 
 
@@ -721,6 +929,9 @@ ax_t.plot(times_2_ev_opt,colatitude_2_ev_opt,color='r',label='timestepping/optim
 
 # highlight the reversal instant
 ax_t.plot(times_2_ev_opt,np.zeros(times_2_ev_opt.shape),'--',color='k')
+plt.xlabel('Time / yr')
+plt.ylabel('Dipole latitude / $^\circ$')
+ax_t.set_ylim(-90, 90)
 
 ax_t.set_xlim([2019,2220])
 #ax_t.set_ylim([60,95])
@@ -734,16 +945,17 @@ plt.savefig('dipole_tilt_decay_CHAOS_2019.pdf',bbox_inches='tight',pad_inches=0.
 # g10
 #####
 fig_t,ax_t =  plt.subplots(figsize=(8,5))
-colatitude_2 = -(90.0 - 180/np.pi * ( theta_d_2 + (times_2_ev-times_2_ev[0])*theta_ddot_2) )
+#colatitude_2 = -(90.0 - 180/np.pi * ( theta_d_2 + (times_2_ev-times_2_ev[0])*theta_ddot_2) )
 # from optimal g10 solutions
 ax_t.plot(times_1_ev,g10_1 + ( times_1_ev - times_1_ev[0] )*g10dot_1,color='b',label='linear extrapolation')
 ax_t.plot(times_1_ev,coeffs_MF_1_evolved[:,1],color='m',label='timestepping')
 ax_t.plot(times_1_ev_opt,coeffs_MF_1_evolved_opt[:,1],color='r',label='timestepping/optimisation')
 # from optimal theta_d solutions
-ax_t.plot(times_2_ev,colatitude_2,color='b',label='linear extrapolation')
-ax_t.plot(times_2_ev,colatitude_2_ev,color='m',label='timestepping')
-ax_t.plot(times_2_ev_opt,colatitude_2_ev_opt,color='r',label='timestepping/optimisation')
-
+#ax_t.plot(times_2_ev,colatitude_2,color='b',label='linear extrapolation')
+#ax_t.plot(times_2_ev,colatitude_2_ev,color='m',label='timestepping')
+#ax_t.plot(times_2_ev_opt,colatitude_2_ev_opt,color='r',label='timestepping/optimisation')
+plt.xlabel('Time / yr')
+plt.ylabel('g10 / mT')
 
 # highlight the reversal instant
 ax_t.plot(times_1_ev_opt,np.zeros(times_1_ev_opt.shape),'--',color='k')
@@ -755,3 +967,31 @@ ax_t.legend(fontsize=10)
 plt.title('$g_1^0$ [nT]')
 plt.show
 plt.savefig('g10_decay_CHAOS_2019.pdf',bbox_inches='tight',pad_inches=0.0)
+
+
+#########################
+# Inclination time-series
+#########################
+#inclination_locations = np.arctan(np.divide(-Br_locations,np.sqrt(Bt_locations**2+Bp_locations**2)))*180/np.pi
+
+fig_i,ax_i =  plt.subplots(figsize=(8,5))
+
+
+ax_i.set_ylim(-90, 90)
+
+ax_i.plot(times_3_ev_opt,incl_init - ( times_3_ev_opt - times_3_ev_opt[0] )*incl_dot,color='b',
+          label='linear extrapolation')
+ax_i.plot(times_3_ev,incl_ev,color='m',
+          label='timestepping'  )
+ax_i.plot(times_3_ev_opt,incl_ev_opt,color='r',
+          label='timestepping/optimisation'  )
+plt.xlabel('Time / yr')
+plt.ylabel('Inclination / deg')
+# highlight the reversal instant
+ax_i.plot(times_3_ev_opt,np.zeros(times_3_ev_opt.shape),'--',color='k')
+#ax_i.set_xlim(times[0], times[-1])
+ax_i.legend(fontsize=10,loc='lower left')
+plt.title('Inclination at Leeds')
+plt.show
+plt.savefig('inclinations_CHAOS_2019.pdf',bbox_inches='tight',pad_inches=0.0)
+
