@@ -225,6 +225,28 @@ def calcB(beta,theta,phi,a,r):
          
     return Br_r, Bt_r, Bp_r;
 
+
+def calc_spectra(beta,a,r):
+    '''
+    calculate the power spectra components from its SH expansion beta
+    INPUT
+    beta = [l,m,glm,hlm]
+    OUTPUT
+    spectra = sum_m (l+1)* (a/r)**(2*l+4) * betalm**2
+    '''
+
+    Lmax = beta[-1,0]
+    spectra = np.zeros(Lmax)
+    for i in range(beta.shape[0]):
+        l = int(beta[i,0])
+        glm=beta[i,2]
+        hlm=beta[i,3]
+
+        spectra[l-1] = spectra[l-1] + (l+1)* (a/r)**(2*l+4) * (glm**2+hlm**2)
+
+    return spectra;
+
+
 def lin2matCoeffs(beta_lin):
     '''
     convert a series of SH coefficients organised as

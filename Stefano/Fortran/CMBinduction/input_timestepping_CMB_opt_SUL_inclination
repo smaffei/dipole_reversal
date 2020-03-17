@@ -1,0 +1,17 @@
+25
+4 ! this should not matter
+"/nfs/see-fs-01_users/earsmaf/SWIGS/OptimalFlow/IMMAB4_770.9_max_SUL_inclination/OPTIMAL_FLOW.DAT"
+"/nfs/see-fs-01_users/earsmaf/Papers/2019_reversals/dipole_reversal/models/IMMAB4/123.out"
+1 ! 0 = initial flow from file, 1 = initial flow is optimised here
+0.700000 ! ETA
+0.600000 ! ALPHA
+0.000000 ! T0
+1.000000 ! TF
+1.000000 ! DT
+1 ! reverse flow is different
+47.848800 13.822900 ! colat, long 
+13.000000 ! RMS flow
+0.050000 ! scale factor for arrows
+0 ! restriction
+5 ! FLAG optimisation
+1 ! out_rate

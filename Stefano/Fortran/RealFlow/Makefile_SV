@@ -1,0 +1,5 @@
+F90 = ifort # gfortran -ffree-line-length-0
+calc_SV :  calc_SV.F90 subs.F90
+	$(F90) -c   subs.F90
+	$(F90) -o calc_SV calc_SV.F90 subs.o  -lfftw3 
+    

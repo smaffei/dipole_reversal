@@ -62,13 +62,20 @@ folder_test = 'g10_CHAOS6_2019.0007_max_g10'
 # prepare the input file
 subs.write_optimal_flow_input("input_pedagogical_examples",colat_Leeds,lon_Leeds,LMAX_U,LMAX_B_OBS,MODEL,TARGET_RMS,SCALE_FACTOR,RESTRICTION,ETA,FLAG)
 # run the fortran code
-os.system('./dipole_tilt_bound < input_pedagogical_examples')
-os.system('mkdir '+folder_test)
-os.system('mv *DAT '+folder_test)
+U_file = []
+try:
+    U_file = np.loadtxt(folder_test+'/OPTIMAL_FLOW.DAT',skiprows=1)
+except:
+    print('no flow file found')
+    
+if U_file == []:
+    os.system('./dipole_tilt_bound < input_pedagogical_examples')
+    os.system('mkdir '+folder_test)
+    os.system('mv *DAT '+folder_test)
 
-# plot the flow
-subs.show_flow(folder_test+"/")
-subs.show_flow_global(folder_test+"/")
+    # plot the flow
+    subs.show_flow(folder_test+"/")
+    subs.show_flow_global(folder_test+"/")
 
 
 ###############################
@@ -82,12 +89,19 @@ folder_test = 'g11_CHAOS6_2019.0007_max_g10'
 # prepare the input file
 subs.write_optimal_flow_input("input_pedagogical_examples",colat_Leeds,lon_Leeds,LMAX_U,LMAX_B_OBS,MODEL,TARGET_RMS,SCALE_FACTOR,RESTRICTION,ETA,FLAG)
 # run the fortran code
-os.system('./dipole_tilt_bound < input_pedagogical_examples')
-os.system('mkdir '+folder_test)
-os.system('mv *DAT '+folder_test)
-# plot the flow
-subs.show_flow(folder_test+"/")
-subs.show_flow_global(folder_test+"/")
+U_file = []
+try:
+    U_file = np.loadtxt(folder_test+'/OPTIMAL_FLOW.DAT',skiprows=1)
+except:
+    print('no flow file found')
+    
+if U_file == []:
+    os.system('./dipole_tilt_bound < input_pedagogical_examples')
+    os.system('mkdir '+folder_test)
+    os.system('mv *DAT '+folder_test)
+    # plot the flow
+    subs.show_flow(folder_test+"/")
+    subs.show_flow_global(folder_test+"/")
 
 ###############################
 # PEDAGOGICAL EXAMPLES: 
@@ -101,12 +115,19 @@ folder_test = 'g10_CHAOS6_2019.0007_max_g11'
 # prepare the input file
 subs.write_optimal_flow_input("input_pedagogical_examples",colat_Leeds,lon_Leeds,LMAX_U,LMAX_B_OBS,MODEL,TARGET_RMS,SCALE_FACTOR,RESTRICTION,ETA,FLAG)
 # run the fortran code
-os.system('./dipole_tilt_bound < input_pedagogical_examples')
-os.system('mkdir '+folder_test)
-os.system('mv *DAT '+folder_test)
-# plot the flow
-subs.show_flow(folder_test+"/")
-subs.show_flow_global(folder_test+"/")
+U_file = []
+try:
+    U_file = np.loadtxt(folder_test+'/OPTIMAL_FLOW.DAT',skiprows=1)
+except:
+    print('no flow file found')
+    
+if U_file == []:
+    os.system('./dipole_tilt_bound < input_pedagogical_examples')
+    os.system('mkdir '+folder_test)
+    os.system('mv *DAT '+folder_test)
+    # plot the flow
+    subs.show_flow(folder_test+"/")
+    subs.show_flow_global(folder_test+"/")
 
 ###############################
 # PEDAGOGICAL EXAMPLES: 
@@ -119,12 +140,19 @@ folder_test = 'g11_CHAOS6_2019.0007_max_g11'
 # prepare the input file
 subs.write_optimal_flow_input("input_pedagogical_examples",colat_Leeds,lon_Leeds,LMAX_U,LMAX_B_OBS,MODEL,TARGET_RMS,SCALE_FACTOR,RESTRICTION,ETA,FLAG)
 # run the fortran code
-os.system('./dipole_tilt_bound < input_pedagogical_examples')
-os.system('mkdir '+folder_test)
-os.system('mv *DAT '+folder_test)
-# plot the flow
-subs.show_flow(folder_test+"/")
-subs.show_flow_global(folder_test+"/")
+U_file = []
+try:
+    U_file = np.loadtxt(folder_test+'/OPTIMAL_FLOW.DAT',skiprows=1)
+except:
+    print('no flow file found')
+    
+if U_file == []:
+    os.system('./dipole_tilt_bound < input_pedagogical_examples')
+    os.system('mkdir '+folder_test)
+    os.system('mv *DAT '+folder_test)
+    # plot the flow
+    subs.show_flow(folder_test+"/")
+    subs.show_flow_global(folder_test+"/")
 
 ###############################
 # PEDAGOGICAL EXAMPLES: 
@@ -138,13 +166,20 @@ folder_test = 'g10_small_H_CHAOS6_2019.0007_max_dipole_tilt'
 # prepare the input file
 subs.write_optimal_flow_input("input_pedagogical_examples",colat_Leeds,lon_Leeds,LMAX_U,LMAX_B_OBS,MODEL,TARGET_RMS,SCALE_FACTOR,RESTRICTION,ETA,FLAG)
 # run the fortran code
-os.system('./dipole_tilt_bound < input_pedagogical_examples')
-os.system('mkdir '+folder_test)
-os.system('mv *DAT '+folder_test)
-# plot the flow
-subs.show_flow(folder_test+"/")
-subs.show_flow_global(folder_test+"/")
-subs.show_flow_spectra(folder_test+"/")
+U_file = []
+try:
+    U_file = np.loadtxt(folder_test+'/OPTIMAL_FLOW.DAT',skiprows=1)
+except:
+    print('no flow file found')
+    
+if U_file == []:
+    os.system('./dipole_tilt_bound < input_pedagogical_examples')
+    os.system('mkdir '+folder_test)
+    os.system('mv *DAT '+folder_test)
+    # plot the flow
+    subs.show_flow(folder_test+"/")
+    subs.show_flow_global(folder_test+"/")
+    subs.show_flow_spectra(folder_test+"/")
 
 
 ###############################
@@ -159,21 +194,35 @@ folder_test = 'g10_CHAOS6_2019.0007_max_Leeds_inclination'
 # prepare the input file
 subs.write_optimal_flow_input("input_pedagogical_examples",colat_Leeds,lon_Leeds,LMAX_U,LMAX_B_OBS,MODEL,TARGET_RMS,SCALE_FACTOR,RESTRICTION,ETA,FLAG)
 # run the fortran code
-os.system('./dipole_tilt_bound < input_pedagogical_examples')
-os.system('mkdir '+folder_test)
-os.system('mv *DAT '+folder_test)
-# plot the flow
-subs.show_flow(folder_test+"/")
-subs.show_flow_global(folder_test+"/")
-subs.show_flow_spectra(folder_test+"/")
+U_file = []
+try:
+    U_file = np.loadtxt(folder_test+'/OPTIMAL_FLOW.DAT',skiprows=1)
+except:
+    print('no flow file found')
+    
+if U_file == []:
+    os.system('./dipole_tilt_bound < input_pedagogical_examples')
+    os.system('mkdir '+folder_test)
+    os.system('mv *DAT '+folder_test)
+    # plot the flow
+    subs.show_flow(folder_test+"/")
+    subs.show_flow_global(folder_test+"/")
+    subs.show_flow_spectra(folder_test+"/")
 
 # plot inclination everywhere else
 # calculate SV coefficients first
 FLOW = folder_test+'/OPTIMAL_FLOW.DAT'
 REVERSE=0
 subs.write_calc_SV_input('input_calc_SV',LMAX_U,LMAX_B_OBS,FLOW,MODEL,REVERSE)
-os.system('./calc_SV < input_calc_SV')
-os.system('mv *DAT '+folder_test)
+SV_file = []
+try:
+    SV_file = np.loadtxt(folder_test+'/SV.DAT')
+except:
+    print('no SV file found')
+    
+if SV_file == []:
+    os.system('./calc_SV < input_calc_SV')
+    os.system('mv *DAT '+folder_test)
 # load SV coefficients
 coeffsB    = subs.read_coeffs(MODEL,1,LMAX_B_OBS)
 # these coefficients are in nT/yr
@@ -209,21 +258,35 @@ folder_test = 'g10_CHAOS6_2019.0007_max_Leeds_inclination_poloidal'
 # prepare the input file
 subs.write_optimal_flow_input("input_pedagogical_examples",colat_Leeds,lon_Leeds,LMAX_U,LMAX_B_OBS,MODEL,TARGET_RMS,SCALE_FACTOR,RESTRICTION,ETA,FLAG)
 # run the fortran code
-os.system('./dipole_tilt_bound < input_pedagogical_examples')
-os.system('mkdir '+folder_test)
-os.system('mv *DAT '+folder_test)
-# plot the flow
-subs.show_flow(folder_test+"/")
-subs.show_flow_global(folder_test+"/")
-subs.show_flow_spectra(folder_test+"/")
+U_file = []
+try:
+    U_file = np.loadtxt(folder_test+'/OPTIMAL_FLOW.DAT',skiprows=1)
+except:
+    print('no flow file found')
+    
+if U_file == []:
+    os.system('./dipole_tilt_bound < input_pedagogical_examples')
+    os.system('mkdir '+folder_test)
+    os.system('mv *DAT '+folder_test)
+    # plot the flow
+    subs.show_flow(folder_test+"/")
+    subs.show_flow_global(folder_test+"/")
+    subs.show_flow_spectra(folder_test+"/")
 
 # plot inclination everywhere else
 # calculate SV coefficients first
 FLOW = folder_test+'/OPTIMAL_FLOW.DAT'
 REVERSE=0
 subs.write_calc_SV_input('input_calc_SV',LMAX_U,LMAX_B_OBS,FLOW,MODEL,REVERSE)
-os.system('./calc_SV < input_calc_SV')
-os.system('mv *DAT '+folder_test)
+SV_file = []
+try:
+    SV_file = np.loadtxt(folder_test+'/SV.DAT')
+except:
+    print('no SV file found')
+    
+if SV_file == []:
+    os.system('./calc_SV < input_calc_SV')
+    os.system('mv *DAT '+folder_test)
 # load SV coefficients
 coeffsB    = subs.read_coeffs(MODEL,1,LMAX_B_OBS)
 # these coefficients are in nT/yr
@@ -258,21 +321,35 @@ folder_test = 'g10_CHAOS6_2019.0007_max_Leeds_inclination_toroidal'
 # prepare the input file
 subs.write_optimal_flow_input("input_pedagogical_examples",colat_Leeds,lon_Leeds,LMAX_U,LMAX_B_OBS,MODEL,TARGET_RMS,SCALE_FACTOR,RESTRICTION,ETA,FLAG)
 # run the fortran code
-os.system('./dipole_tilt_bound < input_pedagogical_examples')
-os.system('mkdir '+folder_test)
-os.system('mv *DAT '+folder_test)
-# plot the flow
-subs.show_flow(folder_test+"/")
-subs.show_flow_global(folder_test+"/")
-subs.show_flow_spectra(folder_test+"/")
+U_file = []
+try:
+    U_file = np.loadtxt(folder_test+'/OPTIMAL_FLOW.DAT',skiprows=1)
+except:
+    print('no flow file found')
+    
+if U_file == []:
+    os.system('./dipole_tilt_bound < input_pedagogical_examples')
+    os.system('mkdir '+folder_test)
+    os.system('mv *DAT '+folder_test)
+    # plot the flow
+    subs.show_flow(folder_test+"/")
+    subs.show_flow_global(folder_test+"/")
+    subs.show_flow_spectra(folder_test+"/")
 
 # plot inclination everywhere else
 # calculate SV coefficients first
 FLOW = folder_test+'/OPTIMAL_FLOW.DAT'
 REVERSE=0
 subs.write_calc_SV_input('input_calc_SV',LMAX_U,LMAX_B_OBS,FLOW,MODEL,REVERSE)
-os.system('./calc_SV < input_calc_SV')
-os.system('mv *DAT '+folder_test)
+SV_file = []
+try:
+    SV_file = np.loadtxt(folder_test+'/SV.DAT')
+except:
+    print('no SV file found')
+    
+if SV_file == []:
+    os.system('./calc_SV < input_calc_SV')
+    os.system('mv *DAT '+folder_test)
 # load SV coefficients
 coeffsB    = subs.read_coeffs(MODEL,1,LMAX_B_OBS)
 # these coefficients are in nT/yr
@@ -306,21 +383,35 @@ folder_test = 'g10_CHAOS6_2019.0007_max_Leeds_inclination_columnar'
 # prepare the input file
 subs.write_optimal_flow_input("input_pedagogical_examples",colat_Leeds,lon_Leeds,LMAX_U,LMAX_B_OBS,MODEL,TARGET_RMS,SCALE_FACTOR,RESTRICTION,ETA,FLAG)
 # run the fortran code
-os.system('./dipole_tilt_bound < input_pedagogical_examples')
-os.system('mkdir '+folder_test)
-os.system('mv *DAT '+folder_test)
-# plot the flow
-subs.show_flow(folder_test+"/")
-subs.show_flow_global(folder_test+"/")
-subs.show_flow_spectra(folder_test+"/")
+U_file = []
+try:
+    U_file = np.loadtxt(folder_test+'/OPTIMAL_FLOW.DAT',skiprows=1)
+except:
+    print('no flow file found')
+    
+if U_file == []:
+    os.system('./dipole_tilt_bound < input_pedagogical_examples')
+    os.system('mkdir '+folder_test)
+    os.system('mv *DAT '+folder_test)
+    # plot the flow
+    subs.show_flow(folder_test+"/")
+    subs.show_flow_global(folder_test+"/")
+    subs.show_flow_spectra(folder_test+"/")
 
 # plot inclination everywhere else
 # calculate SV coefficients first
 FLOW = folder_test+'/OPTIMAL_FLOW.DAT'
 REVERSE=0
 subs.write_calc_SV_input('input_calc_SV',LMAX_U,LMAX_B_OBS,FLOW,MODEL,REVERSE)
-os.system('./calc_SV < input_calc_SV')
-os.system('mv *DAT '+folder_test)
+SV_file = []
+try:
+    SV_file = np.loadtxt(folder_test+'/SV.DAT')
+except:
+    print('no SV file found')
+    
+if SV_file == []:
+    os.system('./calc_SV < input_calc_SV')
+    os.system('mv *DAT '+folder_test)
 # load SV coefficients
 coeffsB    = subs.read_coeffs(MODEL,1,LMAX_B_OBS)
 # these coefficients are in nT/yr
@@ -356,21 +447,35 @@ folder_test = 'g10_small_H_CHAOS6_2019.0007_max_Leeds_inclination'
 # prepare the input file
 subs.write_optimal_flow_input("input_pedagogical_examples",colat_Leeds,lon_Leeds,LMAX_U,LMAX_B_OBS,MODEL,TARGET_RMS,SCALE_FACTOR,RESTRICTION,ETA,FLAG)
 # run the fortran code
-os.system('./dipole_tilt_bound < input_pedagogical_examples')
-os.system('mkdir '+folder_test)
-os.system('mv *DAT '+folder_test)
-# plot the flow
-subs.show_flow(folder_test+"/")
-subs.show_flow_global(folder_test+"/")
-subs.show_flow_spectra(folder_test+"/")
+U_file = []
+try:
+    U_file = np.loadtxt(folder_test+'/OPTIMAL_FLOW.DAT',skiprows=1)
+except:
+    print('no flow file found')
+    
+if U_file == []:
+    os.system('./dipole_tilt_bound < input_pedagogical_examples')
+    os.system('mkdir '+folder_test)
+    os.system('mv *DAT '+folder_test)
+    # plot the flow
+    subs.show_flow(folder_test+"/")
+    subs.show_flow_global(folder_test+"/")
+    subs.show_flow_spectra(folder_test+"/")
 
 # plot inclination everywhere else
 # calculate SV coefficients first
 FLOW = folder_test+'/OPTIMAL_FLOW.DAT'
 REVERSE=0
 subs.write_calc_SV_input('input_calc_SV',LMAX_U,LMAX_B_OBS,FLOW,MODEL,REVERSE)
-os.system('./calc_SV < input_calc_SV')
-os.system('mv *DAT '+folder_test)
+SV_file = []
+try:
+    SV_file = np.loadtxt(folder_test+'/SV.DAT')
+except:
+    print('no SV file found')
+    
+if SV_file == []:
+    os.system('./calc_SV < input_calc_SV')
+    os.system('mv *DAT '+folder_test)
 # load SV coefficients
 coeffsB    = subs.read_coeffs(MODEL,1,LMAX_B_OBS)
 # these coefficients are in nT/yr
@@ -496,6 +601,388 @@ cs = map1.contourf(xs,ys,dIdt,cmap="coolwarm")
 plt.colorbar(cs,fraction=0.03, pad=0.04)
 """
 
+
+
+############################################
+# SENSITIVITY STUDY
+# Optimal inclination from 2019 CHAOS model
+###########################################
+
+
+#first: calculate spectra of CHAOS-6x9 model:
+    
+CHAOS_2019 = '../models/CHAOS-6/CHAOS-6-x9_core_2019.0007.dat' 
+L_CHAOS=20
+coeffs_CHAOS_full=subs.read_coeffs(CHAOS_2019,1,L_CHAOS)
+
+CHAOS_a_spectra = SH_library.calc_spectra(coeffs_CHAOS_full,r_a,r_a)
+CHAOS_cmb_spectra = SH_library.calc_spectra(coeffs_CHAOS_full,r_a,r_c)
+
+fig, axs = plt.subplots(1, 1, figsize=(8,8))
+#fig.suptitle('CHAOS6x9, 2019 spectra')
+
+axs.set_yscale('log')
+axs.plot(np.linspace(1,L_CHAOS,L_CHAOS),CHAOS_a_spectra/1e6,'o',color='r',
+         label='Surface')
+axs.plot(np.linspace(1,L_CHAOS,L_CHAOS),CHAOS_cmb_spectra/1e6,'o',color='b',
+         label='CMB')
+#axs[0].set_ylim([np.amin(ME_a_spectra[:,1:]), np.amax(ME_a_spectra[:,1:])  ])
+#axs.set_ylim([1e-2, 1e4 ])
+#axs.set_xticks(np.linspace(1,L_CHAOS,L_CHAOS))
+axs.set_title('CHAOS6x9, 2019 spectra')
+axs.set_xlabel('SH degree')
+axs.set_ylabel('$\mu T^2$')
+axs.grid(True)
+axs.legend(fontsize=10,loc='upper left')
+fig.tight_layout(rect=[0,0, 1, 0.95])
+plt.show()
+plt.savefig('../models/CHAOS-6/CHAOS_2019_spectra.pdf',bbox_inches='tight',pad_inches=0.0)
+
+# sensitivity calculations
+colat_SUL = 47.8488
+lon_SUL   = 13.8229 
+LMAX_U      = 25
+LMAX_B_OBS  = 13
+MODEL       = '../models/CHAOS-6/CHAOS-6-x9_core_2019.0007.dat' 
+TARGET_RMS  = 13 
+SCALE_FACTOR = 5e-2
+RESTRICTION  = 0
+ETA          = 0
+FLAG         = 5
+ 
+
+# fix LMAX_B_OBS and vary LMAX_U for unrestricted flow
+filename = 'dIdt_CHAOS6_2019_LMAX_B_OBS_'+str(LMAX_B_OBS)+'.txt'
+LMAX_U_list =np.concatenate((np.linspace(1,25,num=25),np.linspace(30,100,num=8)),axis=0)
+Iopt = []
+try:
+    Iopt = np.loadtxt(filename)
+except:
+    print('no incliation file found')
+    
+if Iopt == []:
+    for LMAX_U in LMAX_U_list:
+        subs.write_optimal_flow_input("input_pedagogical_examples",colat_Leeds,lon_Leeds,LMAX_U,LMAX_B_OBS,MODEL,TARGET_RMS,SCALE_FACTOR,RESTRICTION,ETA,FLAG)
+        os.system('./dipole_tilt_bound < input_pedagogical_examples')
+        Iopt_file = open('./OPTIMISED_QUANTITY_DOT.DAT', 'r')
+        Iopt_file.readline() # header
+        line=Iopt_file.readline()
+        x = [list(map(float, line.split() ))]
+        Iopt_file.close()
+        Iopt=np.append(Iopt,[LMAX_U, LMAX_B_OBS, x[0][0]])
+        print(LMAX_U, LMAX_B_OBS, x[0][0])
+        os.system('rm *DAT')
+        
+    Iopt = np.reshape(Iopt,(len(Iopt)/3, 3))     
+    np.savetxt(filename,Iopt,fmt='%6d %6d %.10f')
+
+Iopt_fixed_LB = np.loadtxt(filename)
+
+# fix LMAX_U and vary LMAX_B_OBS for unrestricted flow
+LMAX_U      = 25
+filename = 'dIdt_CHAOS6_2019_LMAX_U_'+str(LMAX_U)+'.txt'
+# define the LMAX_B_OBSs on which to test the code
+LMAX_B_OBS_list = np.linspace(1,13,num=13)
+Iopt = []
+try:
+    Iopt = np.loadtxt(filename)
+except:
+    print('no incliation file found')
+    
+if Iopt == []:
+    for LMAX_B_OBS in LMAX_B_OBS_list:
+        subs.write_optimal_flow_input("input_pedagogical_examples",colat_Leeds,lon_Leeds,LMAX_U,LMAX_B_OBS,MODEL,TARGET_RMS,SCALE_FACTOR,RESTRICTION,ETA,FLAG)
+        os.system('./dipole_tilt_bound < input_pedagogical_examples')
+        Iopt_file = open('./OPTIMISED_QUANTITY_DOT.DAT', 'r')
+        Iopt_file.readline() # header
+        line=Iopt_file.readline()
+        x = [list(map(float, line.split() ))]
+        Iopt_file.close()
+        Iopt=np.append(Iopt,[LMAX_U, LMAX_B_OBS, x[0][0]])
+        print(LMAX_U, LMAX_B_OBS, x[0][0])
+        os.system('rm *DAT')
+        
+    Iopt = np.reshape(Iopt,(len(Iopt)/3, 3))     
+    np.savetxt(filename,Iopt,fmt='%6d %6d %.10f')
+    
+Iopt_fixed_LU = np.loadtxt(filename)
+
+
+
+
+# fix LMAX_B_OBS and vary LMAX_U for columnar flow
+RESTRICTION  = 3
+LMAX_U      = 25
+LMAX_B_OBS  = 13
+filename = 'dIdt_CHAOS6_2019_LMAX_B_OBS_'+str(LMAX_B_OBS)+'_columnar.txt'
+LMAX_U_list =np.concatenate((np.linspace(1,25,num=25),np.linspace(30,100,num=8)),axis=0)
+Iopt = []
+try:
+    Iopt = np.loadtxt(filename)
+except:
+    print('no incliation file found')
+    
+if Iopt == []:
+    for LMAX_U in LMAX_U_list:
+        subs.write_optimal_flow_input("input_pedagogical_examples",colat_Leeds,lon_Leeds,LMAX_U,LMAX_B_OBS,MODEL,TARGET_RMS,SCALE_FACTOR,RESTRICTION,ETA,FLAG)
+        os.system('./dipole_tilt_bound < input_pedagogical_examples')
+        Iopt_file = open('./OPTIMISED_QUANTITY_DOT.DAT', 'r')
+        Iopt_file.readline() # header
+        line=Iopt_file.readline()
+        x = [list(map(float, line.split() ))]
+        Iopt_file.close()
+        Iopt=np.append(Iopt,[LMAX_U, LMAX_B_OBS, x[0][0]])
+        print(LMAX_U, LMAX_B_OBS, x[0][0])
+        os.system('rm *DAT')
+        
+    Iopt = np.reshape(Iopt,(len(Iopt)/3, 3))     
+    np.savetxt(filename,Iopt,fmt='%6d %6d %.10f')
+
+Iopt_fixed_LB_columnar = np.loadtxt(filename)
+
+# fix LMAX_U and vary LMAX_B_OBS for columnar flow
+LMAX_U      = 25
+filename = 'dIdt_CHAOS6_2019_LMAX_U_'+str(LMAX_U)+'_columnar.txt'
+# define the LMAX_B_OBSs on which to test the code
+LMAX_B_OBS_list = np.linspace(1,13,num=13)
+Iopt = []
+try:
+    Iopt = np.loadtxt(filename)
+except:
+    print('no incliation file found')
+    
+if Iopt == []:
+    for LMAX_B_OBS in LMAX_B_OBS_list:
+        subs.write_optimal_flow_input("input_pedagogical_examples",colat_Leeds,lon_Leeds,LMAX_U,LMAX_B_OBS,MODEL,TARGET_RMS,SCALE_FACTOR,RESTRICTION,ETA,FLAG)
+        os.system('./dipole_tilt_bound < input_pedagogical_examples')
+        Iopt_file = open('./OPTIMISED_QUANTITY_DOT.DAT', 'r')
+        Iopt_file.readline() # header
+        line=Iopt_file.readline()
+        x = [list(map(float, line.split() ))]
+        Iopt_file.close()
+        Iopt=np.append(Iopt,[LMAX_U, LMAX_B_OBS, x[0][0]])
+        print(LMAX_U, LMAX_B_OBS, x[0][0])
+        os.system('rm *DAT')
+        
+    Iopt = np.reshape(Iopt,(len(Iopt)/3, 3))     
+    np.savetxt(filename,Iopt,fmt='%6d %6d %.10f')
+    
+Iopt_fixed_LU_columnar = np.loadtxt(filename)
+
+
+# plot inclination sensitivity to flow field truncation
+fig, axs = plt.subplots(1, 2, figsize=(10,5))
+fig.suptitle('Max $dI/dt$ (in $deg/yr$) at SUL (CHAOS6x9, 2019)',fontsize = 20)
+
+#ax_i.set_ylim(-90, 90)
+
+axs[0].plot(Iopt_fixed_LB[:,0],Iopt_fixed_LB[:,2]* 180.0/np.pi,'--k',marker='s',markerfacecolor='b',
+          label='unrestricted flow')
+axs[0].plot(Iopt_fixed_LB_columnar[:,0],Iopt_fixed_LB_columnar[:,2]* 180.0/np.pi,'--k',marker='s',markerfacecolor='g',
+          label='columnar flow')
+axs[0].set_title('Fixed $L_B=13$',fontsize=15)
+axs[0].set_xlabel('$L_U$')
+#axs[0].set_ylabel('Max $dI/dt$ / (deg/yr)',fontsize=16)
+axs[0].set_xscale('log')
+axs[0].set_yscale('log')
+axs[0].legend(fontsize=10,loc='lower right')
+axs[0].grid(which='both',alpha=0.5)
+
+# plot inclination sensitivity
+axs[1].plot(Iopt_fixed_LU[:,1],Iopt_fixed_LU[:,2]* 180.0/np.pi,'--k',marker='s',markerfacecolor='b',
+          label='unrestricted flow')
+axs[1].plot(Iopt_fixed_LU_columnar[:,1],Iopt_fixed_LU_columnar[:,2]* 180.0/np.pi,'--k',marker='s',markerfacecolor='g',
+          label='columnar flow')
+axs[1].set_title('Fixed $L_U=25$',fontsize=15)
+axs[1].set_xlabel('$L_B$')
+#axs[1].set_ylabel('Max dI/Dt / (deg/yr)')
+axs[1].set_xscale('log')
+axs[1].set_yscale('log')
+axs[1].legend(fontsize=10,loc='upper left')
+axs[1].grid(which='both',alpha=0.5)
+
+fig.tight_layout(rect=[0,0, 1, 0.94])
+
+plt.show
+plt.savefig('dIdt_sensitivity_CHAOS_2019_SUL.pdf',bbox_inches='tight',pad_inches=0.0)
+
+
+
+############################################
+# SENSITIVITY STUDY
+# Optimal dipole tilt from 2019 CHAOS model
+###########################################
+
+# sensitivity calculations
+colat_SUL = 47.8488
+lon_SUL   = 13.8229 
+LMAX_U      = 25
+LMAX_B_OBS  = 13
+MODEL       = '../models/CHAOS-6/CHAOS-6-x9_core_2019.0007.dat' 
+TARGET_RMS  = 13 
+SCALE_FACTOR = 5e-2
+RESTRICTION  = 0
+ETA          = 0
+FLAG         = 0
+ 
+
+# fix LMAX_B_OBS and vary LMAX_U for unrestricted flow
+filename = 'dtiltdt_CHAOS6_2019_LMAX_B_OBS_'+str(LMAX_B_OBS)+'.txt'
+LMAX_U_list =np.concatenate((np.linspace(1,25,num=25),np.linspace(30,100,num=8)),axis=0)
+tilt_opt = []
+try:
+    tilt_opt = np.loadtxt(filename)
+except:
+    print('no tilt file found')
+    
+if tilt_opt == []:
+    for LMAX_U in LMAX_U_list:
+        subs.write_optimal_flow_input("input_pedagogical_examples",colat_SUL,lon_SUL,LMAX_U,LMAX_B_OBS,MODEL,TARGET_RMS,SCALE_FACTOR,RESTRICTION,ETA,FLAG)
+        os.system('./dipole_tilt_bound < input_pedagogical_examples')
+        tilt_opt_file = open('./OPTIMISED_QUANTITY_DOT.DAT', 'r')
+        tilt_opt_file.readline() # header
+        line=tilt_opt_file.readline()
+        x = [list(map(float, line.split() ))]
+        tilt_opt_file.close()
+        tilt_opt=np.append(tilt_opt,[LMAX_U, LMAX_B_OBS, x[0][0]])
+        print(LMAX_U, LMAX_B_OBS, x[0][0])
+        os.system('rm *DAT')
+        
+    tilt_opt = np.reshape(tilt_opt,(len(tilt_opt)/3, 3))     
+    np.savetxt(filename,tilt_opt,fmt='%6d %6d %.10f')
+
+tilt_opt_fixed_LB = np.loadtxt(filename)
+
+# fix LMAX_U and vary LMAX_B_OBS for unrestricted flow
+LMAX_U      = 25
+filename = 'dtiltdt_CHAOS6_2019_LMAX_U_'+str(LMAX_U)+'.txt'
+# define the LMAX_B_OBSs on which to test the code
+LMAX_B_OBS_list = np.linspace(1,13,num=13)
+tilt_opt = []
+try:
+    tilt_opt = np.loadtxt(filename)
+except:
+    print('no tilt file found')
+    
+if tilt_opt == []:
+    for LMAX_B_OBS in LMAX_B_OBS_list:
+        subs.write_optimal_flow_input("input_pedagogical_examples",colat_SUL,lon_SUL,LMAX_U,LMAX_B_OBS,MODEL,TARGET_RMS,SCALE_FACTOR,RESTRICTION,ETA,FLAG)
+        os.system('./dipole_tilt_bound < input_pedagogical_examples')
+        tilt_opt_file = open('./OPTIMISED_QUANTITY_DOT.DAT', 'r')
+        tilt_opt_file.readline() # header
+        line=tilt_opt_file.readline()
+        x = [list(map(float, line.split() ))]
+        tilt_opt_file.close()
+        tilt_opt=np.append(tilt_opt,[LMAX_U, LMAX_B_OBS, x[0][0]])
+        print(LMAX_U, LMAX_B_OBS, x[0][0])
+        os.system('rm *DAT')
+        
+    tilt_opt = np.reshape(tilt_opt,(len(tilt_opt)/3, 3))     
+    np.savetxt(filename,tilt_opt,fmt='%6d %6d %.10f')
+    
+tilt_opt_fixed_LU = np.loadtxt(filename)
+
+
+
+
+# fix LMAX_B_OBS and vary LMAX_U for columnar flow
+RESTRICTION  = 3
+LMAX_U      = 25
+LMAX_B_OBS  = 13
+filename = 'dtiltdt_CHAOS6_2019_LMAX_B_OBS_'+str(LMAX_B_OBS)+'_columnar.txt'
+LMAX_U_list =np.concatenate((np.linspace(1,25,num=25),np.linspace(30,100,num=8)),axis=0)
+tilt_opt = []
+try:
+    tilt_opt = np.loadtxt(filename)
+except:
+    print('no tilt file found')
+    
+if tilt_opt == []:
+    for LMAX_U in LMAX_U_list:
+        subs.write_optimal_flow_input("input_pedagogical_examples",colat_SUL,lon_SUL,LMAX_U,LMAX_B_OBS,MODEL,TARGET_RMS,SCALE_FACTOR,RESTRICTION,ETA,FLAG)
+        os.system('./dipole_tilt_bound < input_pedagogical_examples')
+        tilt_opt_file = open('./OPTIMISED_QUANTITY_DOT.DAT', 'r')
+        tilt_opt_file.readline() # header
+        line=tilt_opt_file.readline()
+        x = [list(map(float, line.split() ))]
+        tilt_opt_file.close()
+        tilt_opt=np.append(tilt_opt,[LMAX_U, LMAX_B_OBS, x[0][0]])
+        print(LMAX_U, LMAX_B_OBS, x[0][0])
+        os.system('rm *DAT')
+        
+    tilt_opt = np.reshape(tilt_opt,(len(tilt_opt)/3, 3))     
+    np.savetxt(filename,tilt_opt,fmt='%6d %6d %.10f')
+
+tilt_opt_fixed_LB_columnar = np.loadtxt(filename)
+
+# fix LMAX_U and vary LMAX_B_OBS for columnar flow
+LMAX_U      = 25
+filename = 'dtiltdt_CHAOS6_2019_LMAX_U_'+str(LMAX_U)+'_columnar.txt'
+# define the LMAX_B_OBSs on which to test the code
+LMAX_B_OBS_list = np.linspace(1,13,num=13)
+tilt_opt = []
+try:
+    tilt_opt = np.loadtxt(filename)
+except:
+    print('no incliation file found')
+    
+if tilt_opt == []:
+    for LMAX_B_OBS in LMAX_B_OBS_list:
+        subs.write_optimal_flow_input("input_pedagogical_examples",colat_SUL,lon_SUL,LMAX_U,LMAX_B_OBS,MODEL,TARGET_RMS,SCALE_FACTOR,RESTRICTION,ETA,FLAG)
+        os.system('./dipole_tilt_bound < input_pedagogical_examples')
+        tilt_opt_file = open('./OPTIMISED_QUANTITY_DOT.DAT', 'r')
+        tilt_opt_file.readline() # header
+        line=tilt_opt_file.readline()
+        x = [list(map(float, line.split() ))]
+        tilt_opt_file.close()
+        tilt_opt=np.append(tilt_opt,[LMAX_U, LMAX_B_OBS, x[0][0]])
+        print(LMAX_U, LMAX_B_OBS, x[0][0])
+        os.system('rm *DAT')
+        
+    tilt_opt = np.reshape(tilt_opt,(len(tilt_opt)/3, 3))     
+    np.savetxt(filename,tilt_opt,fmt='%6d %6d %.10f')
+    
+tilt_opt_fixed_LU_columnar = np.loadtxt(filename)
+
+
+# plot tilt sensitivity to flow field truncation
+fig, axs = plt.subplots(1, 2, figsize=(10,5))
+fig.suptitle(r'Max $d{\theta}_d/dt$ (in $deg/yr$) (CHAOS6x9, 2019)',fontsize = 20)
+
+#ax_i.set_ylim(-90, 90)
+
+axs[0].plot(tilt_opt_fixed_LB[:,0],tilt_opt_fixed_LB[:,2]* 180.0/np.pi,'--k',marker='s',markerfacecolor='b',
+          label='unrestricted flow')
+axs[0].plot(tilt_opt_fixed_LB_columnar[:,0],tilt_opt_fixed_LB_columnar[:,2]* 180.0/np.pi,'--k',marker='s',markerfacecolor='g',
+          label='columnar flow')
+axs[0].set_title('Fixed $L_B=13$',fontsize=15)
+axs[0].set_xlabel('$L_U$')
+axs[0].set_xscale('log')
+axs[0].set_yscale('log')
+axs[0].legend(fontsize=10,loc='lower right')
+axs[0].grid(which='both',alpha=0.5)
+
+# plot tilt sensitivity
+axs[1].plot(tilt_opt_fixed_LU[:,1],tilt_opt_fixed_LU[:,2]* 180.0/np.pi,'--k',marker='s',markerfacecolor='b',
+          label='unrestricted flow')
+axs[1].plot(tilt_opt_fixed_LU_columnar[:,1],tilt_opt_fixed_LU_columnar[:,2]* 180.0/np.pi,'--k',marker='s',markerfacecolor='g',
+          label='columnar flow')
+axs[1].set_title('Fixed $L_U=25$',fontsize=15)
+axs[1].set_xlabel('$L_B$')
+#axs[1].set_ylabel('Max dI/Dt / (deg/yr)')
+axs[1].set_xscale('log')
+axs[1].set_yscale('log')
+axs[1].legend(fontsize=10,loc='upper left')
+axs[1].grid(which='both',alpha=0.5)
+
+fig.tight_layout(rect=[0,0, 1, 0.94])
+
+plt.show
+plt.savefig('dtheta_d_dt_sensitivity_CHAOS_2019.pdf',bbox_inches='tight',pad_inches=0.0)
+
+
+
+
 ##########################################################
 # OPTIMAL REVERSAL TIMES:
 # Optimal g10 from 2019 CHAOS model, linear extrapolation
@@ -516,20 +1003,34 @@ folder_test = 'CHAOS6_2019.0007_max_g10'
 # prepare the input file
 subs.write_optimal_flow_input("input_opt",colat_Leeds,lon_Leeds,LMAX_U,LMAX_B_OBS,MODEL,TARGET_RMS,SCALE_FACTOR,RESTRICTION,ETA,FLAG)
 # run the fortran code
-os.system('./dipole_tilt_bound < input_opt')
-os.system('mkdir '+folder_test)
-os.system('mv *DAT '+folder_test)
+U_file = []
+try:
+    U_file = np.loadtxt(folder_test+'/OPTIMAL_FLOW.DAT',skiprows=1)
+except:
+    print('no flow file found')
+    
+if U_file == []:
+    os.system('./dipole_tilt_bound < input_pedagogical_examples')
+    os.system('mkdir '+folder_test)
+    os.system('mv *DAT '+folder_test)
 
-# plot the flow
-subs.show_flow(folder_test+"/")
-subs.show_flow_global(folder_test+"/")
+    # plot the flow
+    subs.show_flow(folder_test+"/")
+    subs.show_flow_global(folder_test+"/")
 
 # calculte all SV coefficients
 FLOW = folder_test+'/OPTIMAL_FLOW.DAT'
 REVERSE=0
 subs.write_calc_SV_input('input_calc_SV',LMAX_U,LMAX_B_OBS,FLOW,MODEL,REVERSE)
-os.system('./calc_SV < input_calc_SV')
-os.system('mv *DAT '+folder_test)
+SV_file = []
+try:
+    SV_file = np.loadtxt(folder_test+'/SV.DAT')
+except:
+    print('no SV file found')
+    
+if SV_file == []:
+    os.system('./calc_SV < input_calc_SV')
+    os.system('mv *DAT '+folder_test)
 # load SV coefficients
 coeffsB    = subs.read_coeffs(MODEL,1,LMAX_B_OBS)
 # these coefficients are in nT/yr
@@ -564,9 +1065,16 @@ folder_timestep = 'CHAOS6_2019.0007_max_g10_timestep_dt1'
 # prepare the input file
 subs.write_timesteping_input("input_timestepping_CMB",LMAX_U,LMAX_B_OBS,FLOW,MODEL,ETA,ALPHA,T0,TF,DT,REVERSE)
 # run the timestepping fortran code
-os.system('./timestepping_induction < input_timestepping_CMB')
-os.system('mkdir '+folder_timestep)
-os.system('mv *DAT '+folder_timestep)
+U_file = []
+try:
+    U_file = np.loadtxt(folder_test+'/OPTIMAL_FLOW.DAT',skiprows=1)
+except:
+    print('no flow file found')
+    
+if U_file == []:
+    os.system('./dipole_tilt_bound < input_pedagogical_examples')
+    os.system('mkdir '+folder_test)
+    os.system('mv *DAT '+folder_test)
 # load MF coefficients
 coeffs_MF_1_evolved = subs.read_MF_file(folder_timestep+'/MF_COEFFS.DAT')
 times_1_ev = coeffs_MF_1_evolved[:,0]
@@ -642,21 +1150,35 @@ folder_test = 'CHAOS6_2019.0007_max_dipole_tilt'
 # prepare the input file
 subs.write_optimal_flow_input("input_opt",colat_Leeds,lon_Leeds,LMAX_U,LMAX_B_OBS,MODEL,TARGET_RMS,SCALE_FACTOR,RESTRICTION,ETA,FLAG)
 # run the fortran code
-os.system('./dipole_tilt_bound < input_opt')
-os.system('mkdir '+folder_test)
-os.system('mv *DAT '+folder_test)
+U_file = []
+try:
+    U_file = np.loadtxt(folder_test+'/OPTIMAL_FLOW.DAT',skiprows=1)
+except:
+    print('no flow file found')
+    
+if U_file == []:
+    os.system('./dipole_tilt_bound < input_pedagogical_examples')
+    os.system('mkdir '+folder_test)
+    os.system('mv *DAT '+folder_test)
 
-# plot the flow
-subs.show_flow(folder_test+"/")
-subs.show_flow_global(folder_test+"/")
+    # plot the flow
+    subs.show_flow(folder_test+"/")
+    subs.show_flow_global(folder_test+"/")
 
 # calculte all SV coefficients
 FLOW = folder_test+'/OPTIMAL_FLOW.DAT'
 REVERSE=1
 
 subs.write_calc_SV_input('input_calc_SV',LMAX_U,LMAX_B_OBS,FLOW,MODEL,REVERSE)
-os.system('./calc_SV < input_calc_SV')
-os.system('mv *DAT '+folder_test)
+SV_file = []
+try:
+    SV_file = np.loadtxt(folder_test+'/SV.DAT')
+except:
+    print('no SV file found')
+    
+if SV_file == []:
+    os.system('./calc_SV < input_calc_SV')
+    os.system('mv *DAT '+folder_test)
 # load SV coefficients
 coeffsB    = subs.read_coeffs(MODEL,1,LMAX_B_OBS)
 # these coefficients are in nT/yr
@@ -689,9 +1211,17 @@ folder_timestep = 'CHAOS6_2019.0007_max_dipolte_tilt_timestep_dt1'
 # prepare the input file
 subs.write_timesteping_input("input_timestepping_CMB",LMAX_U,LMAX_B_OBS,FLOW,MODEL,ETA,ALPHA,T0,TF,DT,REVERSE)
 # run the timestepping fortran code
-os.system('./timestepping_induction < input_timestepping_CMB')
-os.system('mkdir '+folder_timestep)
-os.system('mv *DAT '+folder_timestep)
+U_file = []
+try:
+    U_file = np.loadtxt(folder_test+'/OPTIMAL_FLOW.DAT',skiprows=1)
+except:
+    print('no flow file found')
+    
+if U_file == []:
+    os.system('./dipole_tilt_bound < input_pedagogical_examples')
+    os.system('mkdir '+folder_test)
+    os.system('mv *DAT '+folder_test)
+
 
 coeffs_MF_2_evolved = subs.read_MF_file(folder_timestep+'/MF_COEFFS.DAT')
 times_2_ev = coeffs_MF_2_evolved[:,0]
@@ -779,21 +1309,35 @@ folder_test = 'CHAOS6_2019.0007_max_Leeds_inclination'
 # prepare the input file
 subs.write_optimal_flow_input("input_opt",colat_Leeds,lon_Leeds,LMAX_U,LMAX_B_OBS,MODEL,TARGET_RMS,SCALE_FACTOR,RESTRICTION,ETA,FLAG)
 # run the fortran code
-os.system('./dipole_tilt_bound < input_opt')
-os.system('mkdir '+folder_test)
-os.system('mv *DAT '+folder_test)
+U_file = []
+try:
+    U_file = np.loadtxt(folder_test+'/OPTIMAL_FLOW.DAT',skiprows=1)
+except:
+    print('no flow file found')
+    
+if U_file == []:
+    os.system('./dipole_tilt_bound < input_pedagogical_examples')
+    os.system('mkdir '+folder_test)
+    os.system('mv *DAT '+folder_test)
 
-# plot the flow
-subs.show_flow(folder_test+"/")
-subs.show_flow_global(folder_test+"/")
+    # plot the flow
+    subs.show_flow(folder_test+"/")
+    subs.show_flow_global(folder_test+"/")
 
 # calculte all SV coefficients
 FLOW = folder_test+'/OPTIMAL_FLOW.DAT'
 REVERSE = 1
 
 subs.write_calc_SV_input('input_calc_SV',LMAX_U,LMAX_B_OBS,FLOW,MODEL,REVERSE)
-os.system('./calc_SV < input_calc_SV')
-os.system('mv *DAT '+folder_test)
+SV_file = []
+try:
+    SV_file = np.loadtxt(folder_test+'/SV.DAT')
+except:
+    print('no SV file found')
+    
+if SV_file == []:
+    os.system('./calc_SV < input_calc_SV')
+    os.system('mv *DAT '+folder_test)
 
 # these coefficients are in nT/yr
 coeffs_SV_3_inst = subs.read_coeffs(folder_test+'/SV.DAT',0,LMAX_B_OBS+LMAX_U)
@@ -826,9 +1370,17 @@ folder_timestep = 'CHAOS6_2019.0007_max_Leeds_inclination_timestep_dt1'
 # prepare the input file
 subs.write_timesteping_input("input_timestepping_CMB",LMAX_U,LMAX_B_OBS,FLOW,MODEL,ETA,ALPHA,T0,TF,DT,REVERSE)
 # run the timestepping fortran code
-os.system('./timestepping_induction < input_timestepping_CMB')
-os.system('mkdir '+folder_timestep)
-os.system('mv *DAT '+folder_timestep)
+MF_file = []
+try:
+    MF_file = np.loadtxt(folder_timestep+'/MF_COEFFS.DAT')
+except:
+    print('no MF file found')
+    
+if MF_file == []:
+    # run the timestepping fortran code
+    os.system('./timestepping_induction_opt < input_timestepping_CMB_opt')
+    os.system('mkdir '+folder_timestep)
+    os.system('mv *DAT '+folder_timestep)
 
 coeffs_MF_3_evolved = subs.read_MF_file(folder_timestep+'/MF_COEFFS.DAT')
 times_3_ev = coeffs_MF_3_evolved[:,0]
@@ -848,7 +1400,7 @@ for it in range(coeffs_MF_3_evolved.shape[0]):
 ################################################################
 
 folder_timestep = 'CHAOS6_2019.0007_max_Leeds_inclination_timestep_opt_dt1'
-REVERSE         = 1
+REVERSE         = 1 
 FLAG_U_INIT     = 1 # start this integration from the previously calculated initial condition
 
 #prepare the input file

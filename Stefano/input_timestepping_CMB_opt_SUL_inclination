@@ -1,0 +1,17 @@
+25
+4 ! this should not matter
+"IMMAB4_770.9_max_SUL_inclination/OPTIMAL_FLOW.DAT"
+"../models/IMMAB4/123.out"
+1
+0.700000
+0.600000
+0.000000
+200.000000
+1.000000
+0 ! reverse flow is different
+47.848800 13.822900 
+13.000000
+0.050000
+0
+5
+1

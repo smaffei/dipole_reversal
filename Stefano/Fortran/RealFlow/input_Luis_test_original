@@ -1,0 +1,6 @@
+13     !LMAX_U 
+13    !  LMAX_B
+13    ! Filter sv to this Lmax; -1 is no filter
+flow.for    !flow file 
+CHAOS-4-MF-2005.0.dat !magnetic field file
+5d-2   !scale factor for arrows = 1/20: i.e. 20km/yr gives 1cm

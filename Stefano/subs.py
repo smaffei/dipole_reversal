@@ -267,7 +267,11 @@ def show_flow(folder):
     return;
 
 def show_flow_global(folder):
-
+    '''
+    show quiver plot superimposed to intensity plot of the velocity fields from the files of the kind
+    FLOWS_VECTORS_RANDOM.DAT
+    OPTIMAL_FLOW.DAT
+    '''
     input_file = folder+'FLOW_VECTORS_RANDOM.DAT'
     output_file = folder+'flow_mollweide.pdf'
     
@@ -387,6 +391,241 @@ def show_flow_global(folder):
     plt.close('all')
     return;
 
+def show_flow_streamlines(folder,it,r_cmb,r_a):
+    '''
+    plot flows and CMB field from the data stored in the output of the timestepping/optimisation routines:
+        MF_COEFFS.DAT
+        U_POL_COEFFS.DAT
+        U_TOR_COEFFS.DAT
+    INPUT:
+        folder: location of the .DAT files
+        it : time instant (line of the files) that is to be plotted
+    '''
+    
+    ###################################
+    # define the grid
+    # input lat-lon resolution
+    nlats = 80
+    nlons = 150
+    lats = np.linspace(-np.pi / 2, np.pi / 2, nlats)
+    lons = np.linspace(0, 2 * np.pi, nlons)
+    lons, lats = np.meshgrid(lons, lats)
+    theta = -lats+np.pi/2
+    
+    Ush = np.zeros(theta.shape) # u_th
+    Vsh = np.zeros(theta.shape) # u_ph
+    Br_c = np.zeros(theta.shape) # B_r
+    Br_a = np.zeros(theta.shape) # B_r
+    Bt_a = np.zeros(theta.shape) # B_r
+    Bp_a = np.zeros(theta.shape) # B_r
+
+    # input legends
+    legend1 = ''
+
+    #################################
+    # read U coefficients
+    f_U_pol_coeffs = open(folder+'U_POL_COEFFS.DAT', 'r')
+    f_U_tor_coeffs = open(folder+'U_TOR_COEFFS.DAT', 'r')
+    lines_pol=f_U_pol_coeffs.readlines()
+    lines_tor=f_U_tor_coeffs.readlines()
+    f_U_pol_coeffs.close()
+    f_U_tor_coeffs.close()
+    
+    line_pol = lines_pol[it]
+    line_tor = lines_tor[it]
+    x = [list(map(float, line_pol.split() ))]
+    U_pol_coeffs = np.asarray(x[0])
+    x = [list(map(float, line_tor.split() ))]
+    U_tor_coeffs = np.asarray(x[0])
+    LmaxU = int(math.ceil( -1+np.sqrt(U_tor_coeffs.size) ))
+    
+    ###################################
+    # read MF coefficients
+    f_MF_coeffs = open(folder+'MF_COEFFS.DAT', 'r')
+    lines_MF=f_MF_coeffs.readlines()
+    line_MF = lines_MF[it]
+    f_MF_coeffs.close()
+    
+    x = [list(map(float, line_MF.split() ))]
+    MF_coeffs = np.asarray(x[0])
+    LmaxB = int(math.ceil( -1+np.sqrt(MF_coeffs.size) ))
+
+
+    # calculate B and U
+    l = 1
+    m = 0
+    cs = 'c'
+    KE_pol = np.zeros(LmaxU)
+    KE_tor = np.zeros(LmaxU)
+    ME_a   = np.zeros(LmaxB)
+    ME_cmb = np.zeros(LmaxB)
+    
+    for ic in range(max([len(U_pol_coeffs[1:-1]), len(MF_coeffs[1:-1])])):    
+        dthSH = DthSchmidtSH(l,m,theta,lons,cs)
+        dphSH = DphSchmidtSH(l,m,theta,lons,cs)
+    
+        if ic < len(U_pol_coeffs[1:-1]):
+            
+            slm = U_pol_coeffs[ic+1]
+            tlm = U_tor_coeffs[ic+1]
+            
+            Ush = Ush + tlm * np.divide(dphSH,np.sin(theta))  \
+                      + slm * dthSH  \
+        
+            Vsh = Vsh - tlm * dthSH / r_cmb \
+                      + slm * np.divide(dphSH,np.sin(theta))  \
+            # spectra of flow
+            # correct for the factor that was multiplied to the coefficients in the input file
+            # the coefficients are still normalized to the target u_rms value          
+            factor = (r_cmb/1000)
+            q_pol = 	slm*factor
+            q_tor = 	tlm*factor
+    
+            # the coefficients should be such that u_rms is the target rms (13 km/yr in Livermore, 2014)  
+            norm = 4*np.pi*l*(l+1)/(2*l+1)
+            KE_pol[l-1] =  KE_pol[l-1] + norm * (q_pol**2)
+            KE_tor[l-1] =  KE_tor[l-1] + norm * (q_tor**2)
+           
+        if ic < len(MF_coeffs[1:-1]):
+            
+            glm = MF_coeffs[ic+1]
+            SH    = SchmidtSH(l,m,theta,lons,cs)           
+            
+            Br_c = Br_c + (l+1) * (r_a/r_cmb)**(l+2) *glm * SH                     
+            Br_a = Br_a + (l+1) * (r_a/r_a)**(l+2) * glm * SH                    
+            Bt_a = Bt_a - (r_a/r_a)**(l+2) * glm * dthSH               
+            Bp_a = Bp_a - (r_a/r_a)**(l+2) * glm * np.divide(dphSH,np.sin(theta))   
+            
+            ME_a[l-1]   =  ME_a[l-1]    + (l+1) * (glm**2)
+            ME_cmb[l-1] =  ME_cmb[l-1]  + (l+1) * (r_a/r_cmb)**(2*l+4) * (glm**2)
+    
+        # updte indices
+        if cs == 'c':
+            if m==0:
+                m=1
+            elif m>0:
+                cs = 's'
+        elif cs == 's':
+            if m<l:
+                cs='c'
+                m = m+1
+            elif m == l:
+                l=l+1
+                cs = 'c'
+                m=0
+                
+                
+    F_a = np.sqrt(Br_a**2 + Bt_a**2 + Bp_a**2)        
+    Ush = Ush * r_cmb * 1e-3
+    Vsh = Vsh * r_cmb * 1e-3 
+    speed = np.sqrt(Ush**2 + Vsh**2)
+    
+    lats = np.rad2deg(lats)
+    lons = np.rad2deg(lons)
+    
+    #------#
+    # plots
+    #------#
+
+    # Br-flow map at CMB
+    #sinlge plot
+    files = []
+    
+    fig = plt.figure(figsize=(11, 6))
+    #    plt.cla()
+    ax = fig.add_subplot(1, 1, 1, projection=ccrs.Mollweide())
+    #ax.gridlines(linewidth=1, alpha=0.5, linestyle='-')
+    cf = ax.contourf(lons, lats, Br_c/1000, # breaks down with contourlevels >=24
+                transform=ccrs.PlateCarree(),
+                cmap='coolwarm')
+    ax.contour(lons, lats, Br_c/1000,23, 
+                transform=ccrs.PlateCarree(),
+                colors='k',linewidths=0.5,alpha = 0.3,linestyles = 'solid')
+    
+    plt.colorbar(cf,fraction=0.03, pad=0.04)
+    
+    plt.text(24300000, 0, r'$\mu T$' , fontsize=16)
+    lw = 1.9*speed / np.nanmax(speed)
+    ax.streamplot(lons, lats, Vsh, -Ush, 
+                transform=ccrs.PlateCarree(),
+                linewidth=lw,
+                arrowsize=0.5,
+                density=6,
+                color='k')
+    ax.coastlines()
+    ax.set_global()
+    
+    plt.title(U_pol_coeffs[0], y=1.08)
+    fname = folder +'Br_CMB_%07d.png' % it
+    plt.savefig(fname,  bbox_inches='tight',pad_inches=0.7,dpi=400)
+    files.append(fname)
+    plt.close()
+    
+    
+    # Surface intensity
+    
+    it = 0
+    files = []
+    
+    fig = plt.figure(figsize=(11, 6))
+    #    plt.cla()
+    ax = fig.add_subplot(1, 1, 1, projection=ccrs.Mollweide())
+    #ax.gridlines(linewidth=1, alpha=0.5, linestyle='-')
+    cf = ax.contourf(lons, lats, F_a, # breaks down with contourlevels >=24
+                transform=ccrs.PlateCarree(),
+                cmap='jet')
+    cs=ax.contour(lons, lats, F_a,23, 
+                transform=ccrs.PlateCarree(),
+                colors='k',linewidths=0.5,alpha = 0.3,linestyles = 'solid')
+    plt.colorbar(cf,fraction=0.03, pad=0.04)
+    #cf.clim(vmin=-Brmax, vmax=Brmax)
+    plt.text(24300000, 0, r'$ nT$' , fontsize=16)
+    ax.coastlines()
+    ax.set_global()
+    
+    
+    plt.title(U_pol_coeffs[0], y=1.08)
+    fname = folder +'F_surface_%07d.png' % it
+    plt.savefig(fname,  bbox_inches='tight',pad_inches=0.7,dpi=400)
+    files.append(fname)
+    plt.close()
+
+    # flow map at CMB
+    #sinlge plot
+    files = []
+    
+    fig = plt.figure(figsize=(11, 6))
+    #    plt.cla()
+    ax = fig.add_subplot(1, 1, 1, projection=ccrs.Mollweide())
+    #ax.gridlines(linewidth=1, alpha=0.5, linestyle='-')
+    
+    cf = ax.contourf(lons, lats, speed, # breaks down with contourlevels >=24
+                transform=ccrs.PlateCarree(),
+                cmap='Blues')
+    ax.contour(lons, lats, speed,23, 
+                transform=ccrs.PlateCarree(),
+                colors='k',linewidths=0.5,alpha = 0.3,linestyles = 'solid')
+    
+    plt.colorbar(cf,fraction=0.03, pad=0.04)
+    
+#    plt.text(24300000, 0, r'$\mu T$' , fontsize=16)
+    lw = 1.9*speed / np.nanmax(speed)
+    ax.streamplot(lons, lats, Vsh, -Ush, 
+                transform=ccrs.PlateCarree(),
+                linewidth=lw,
+                arrowsize=0.5,
+                density=6,
+                color='k')
+    ax.coastlines()
+    ax.set_global()
+    
+    plt.title(U_pol_coeffs[0], y=1.08)
+    fname = folder +'U_CMB_%07d.png' % it
+    plt.savefig(fname,  bbox_inches='tight',pad_inches=0.7,dpi=400)
+    files.append(fname)
+    plt.close()
+
+    return;
 
 def show_flow_spectra(folder):
     # read in coefficients
@@ -490,6 +729,7 @@ def show_global_scatterplot(LONS,LATS,F,COLORMAP,figname):
     plt.savefig(figname,bbox_inches='tight',pad_inches=0.0)
     plt.close('all')
     return;
+
 
 def equispaced_grid(Nth):
 # Create equispoaced grid on a sphere

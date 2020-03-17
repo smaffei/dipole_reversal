@@ -1,0 +1,5 @@
+13     !LMAX_U 
+13    !  LMAX_B
+"/nfs/see-fs-01_users/earsmaf/SWIGS/RealFlow/flow.for"    !flow file 
+CHAOS-4-MF-2005.0.dat !magnetic field file
+0      ! reverse flow flag: 0 = NO, 1 = YES

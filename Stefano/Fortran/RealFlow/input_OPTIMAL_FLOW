@@ -1,0 +1,5 @@
+25     !LMAX_U 
+14    !  LMAX_B
+"/nfs/see-fs-01_users/earsmaf/SWIGS/OptimalFlow/COV_OBS_2010_max_dipole_tilt/OPTIMAL_FLOW.DAT"    !flow file 
+"/nfs/see-fs-01_users/earsmaf/SWIGS/OptimalFlow/gauss2010.000.dat" !magnetic field file
+0      ! reverse flow flag: 0 = NO, 1 = YES
