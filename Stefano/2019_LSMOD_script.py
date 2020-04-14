@@ -62,6 +62,7 @@ lon_Quito = -78.4675
 #Black Sea (LAschamp excursion from Nowaczyk 2012)
 lat_M72_5_22 = 42.225500 
 lon_M72_5_22 = 36.492500
+colat_M72_5_22 = 90 - lat_M72_5_22
 # specific locations
 lat_locations = np.array([lat_Quito, lat_SUL, lat_Sid, lat_M72_5_22]) # equator, sulmona, southern Hemisphere
 theta_locations = -lat_locations*np.pi/180. + np.pi/2
@@ -392,6 +393,30 @@ if g10_opt == []:
     np.savetxt(filename_g10_opt,g10_opt,fmt='%6d %.10f')
     
     
+# optimise for rate of change of VGP lat at black sea location    
+VGPlat_opt = []
+filename_VGPlat_opt = ('dVGPlatdt_M72_5_22_LSMOD1_timeseries.txt')
+try:
+    VGPlat_opt = np.loadtxt(filename_VGPlat_opt)
+except:
+    print('no VGP lat file found')
+    
+if VGPlat_opt == []:
+    for it in times_it:
+        MODEL = '../models/LSMOD1/'+str(int(it))+'.dat'
+        FLAG=7
+        subs.write_optimal_flow_input("input_pedagogical_examples",colat_M72_5_22,lon_M72_5_22,LMAX_U,LMAX_B_OBS,MODEL,TARGET_RMS,SCALE_FACTOR,RESTRICTION,ETA,FLAG)
+        os.system('./dipole_tilt_bound < input_pedagogical_examples')
+        opt_file = open('./OPTIMISED_QUANTITY_DOT.DAT', 'r')
+        opt_file.readline() # header
+        line=opt_file.readline()
+        x = [list(map(float, line.split() ))]
+        opt_file.close()
+        VGPlat_opt=np.append(VGPlat_opt,[it, x[0][0]])
+        os.system('rm *DAT')
+        
+    VGPlat_opt = np.reshape(VGPlat_opt,(len(VGPlat_opt)/2, 2))     
+    np.savetxt(filename_VGPlat_opt,VGPlat_opt,fmt='%6d %.10f')
     
     
 ######################
@@ -454,8 +479,24 @@ plt.show()
 plt.savefig(folder+'figures/LSMOD1_opt_inclinations.pdf',bbox_inches='tight',pad_inches=0.0)
 
 
+# VGP optimal at Black Sea location
 
+fig,ax = plt.subplots(figsize=(8,5))
 
+# add vertical lines for the excursion times
+ax.plot([age[tML], age[tML]],[0.0, 30000],'--',color='gray')
+ax.plot([age[tL], age[tL]],[0.0, 30000],'--',color='gray')
+ax.set_ylim(0.0, 30000)
+
+ax.set_xlabel('Time / kyr')
+ax.set_ylabel(r'Max $|d\lambda_p/dt|$ ($deg/yr$)')
+
+ax.plot(age,VGPlat_opt[:,1]*180/np.pi,color='b')
+ax.set_xlim(age[-1], age[0])
+ax.tick_params('y')
+
+plt.title(r'Max VGP latitude rate of change')
+plt.savefig(folder+'figures/LSMOD1_opt_VGPlat.pdf',bbox_inches='tight',pad_inches=0.0)
 
 
 

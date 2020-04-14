@@ -519,6 +519,33 @@ if g10_opt == []:
     g10_opt = np.reshape(g10_opt,(len(g10_opt)/2, 2))     
     np.savetxt(filename_g10_opt,g10_opt,fmt='%6d %.10f')
     
+
+# optimise for rate of change of VGP lat at sulmona location    
+VGPlat_opt_SUL = []
+filename_VGPlat_opt = ('dVGPlatdt_SUL_IMMAB4_timeseries.txt')
+try:
+    VGPlat_opt_SUL = np.loadtxt(filename_VGPlat_opt)
+except:
+    print('no VGP lat file found')
+    
+if VGPlat_opt_SUL == []:
+    for it in times_it:
+        MODEL = '../models/IMMAB4/'+str(int(it))+'.out'
+        FLAG=7
+        subs.write_optimal_flow_input("input_pedagogical_examples",colat_SUL,lon_SUL,LMAX_U,LMAX_B_OBS,MODEL,TARGET_RMS,SCALE_FACTOR,RESTRICTION,ETA,FLAG)
+        os.system('./dipole_tilt_bound < input_pedagogical_examples')
+        opt_file = open('./OPTIMISED_QUANTITY_DOT.DAT', 'r')
+        opt_file.readline() # header
+        line=opt_file.readline()
+        x = [list(map(float, line.split() ))]
+        opt_file.close()
+        VGPlat_opt_SUL=np.append(VGPlat_opt_SUL,[it, x[0][0]])
+        os.system('rm *DAT')
+        
+    VGPlat_opt_SUL = np.reshape(VGPlat_opt_SUL,(len(VGPlat_opt_SUL)/2, 2))     
+    np.savetxt(filename_VGPlat_opt,VGPlat_opt_SUL,fmt='%6d %.10f')
+    
+    
 #######
 #######
 # plots
@@ -1125,6 +1152,21 @@ plt.show
 plt.savefig(folder+'figures/IMMAB4_opt_inclinations.pdf',bbox_inches='tight',pad_inches=0.0)
 
 
+# VGP lat
 
 
+fig_i,ax_i =  plt.subplots(figsize=(8,5))
+# add vertical lines for the transitional period
+ax_i.plot([times[twrite], times[twrite]],[0, 8000],'--',color='gray')
+ax_i.plot([times[tend], times[tend]],[0, 8000],'--',color='gray')
+ax_i.set_ylim(0, 8000)
+
+ax_i.plot(times,VGPlat_opt_SUL[:,1]*180/np.pi,color='r',)
+plt.xlabel('Time / kyr')
+plt.ylabel(r'Max $|d\lambda_p/dt|$ ($deg/yr$)')
+ax_i.set_xlim(times[0], times[-1])
+ax_i.legend(fontsize=10,loc='upper left')
+plt.title('Max VGP latitude rate of change at SUL')
+plt.show
+plt.savefig(folder+'figures/IMMAB4_opt_VGPlat.pdf',bbox_inches='tight',pad_inches=0.0)
 
