@@ -236,7 +236,7 @@ def calc_spectra(beta,a,r):
     '''
 
     Lmax = beta[-1,0]
-    spectra = np.zeros(Lmax)
+    spectra = np.zeros(int(Lmax))
     for i in range(beta.shape[0]):
         l = int(beta[i,0])
         glm=beta[i,2]

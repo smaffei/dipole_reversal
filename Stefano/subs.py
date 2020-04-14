@@ -776,3 +776,47 @@ def equispaced_grid(Nth):
     lons = np.rad2deg(lons)
     lats = np.rad2deg(lats)
     return theta, lons, lats
+
+
+def VGP_from_DI(Incl,Decl,lat,lon):
+# calculate VGP latitude and longitude from time-series of Inclination, Declination
+# INPUTS:
+# I: time-series of inclination at location
+# D: time-series of declination at location
+# lat, lon: coordinate of location in degrees
+# OUTPUT:
+# VGP_lat, VGP_lon: latitude and longitude of VGP, in degrees
+#
+# Formulas from Encyclopedia of Geomagnetism and Paleomagnetism
+
+    lat = np.deg2rad(lat)#np.pi*lat/180
+    lon = np.deg2rad(lon)#np.pi*lon/180
+    Incl = np.deg2rad(Incl)#np.pi*Incl/180
+    Decl = np.deg2rad(Decl)#np.pi*Decl/180
+    
+    VGP_lat= np.zeros(Incl.shape)
+    VGP_lat[:] = np.nan 
+    VGP_lon= np.zeros(Incl.shape)
+    VGP_lon[:] = np.nan 
+    
+    for i in range(len(Incl)):
+        # relative VGP colat
+        p = np.arctan(2.0 / np.tan(Incl[i]))  
+        if p <0:
+            p = p+np.pi
+        # VGP latitude
+        VGP_lat[i] = np.arcsin( np.sin(lat)*np.cos(p) + np.cos(lat)*np.sin(p)*np.cos(Decl[i]) )
+        # major arc distance
+        beta = np.arcsin( np.sin(p)*np.sin(Decl[i])/np.cos(VGP_lat[i]) )
+        # VGP longitude
+        if np.cos(p)>=np.sin(lat)*np.sin(VGP_lat[i]):
+            VGP_lon[i] = lon + beta
+        else:
+            VGP_lon[i] = lon + np.pi - beta
+        
+    VGP_lon = 180 * VGP_lon/np.pi
+    VGP_lat = 180 * VGP_lat/np.pi
+    
+    
+    return VGP_lat, VGP_lon
+        

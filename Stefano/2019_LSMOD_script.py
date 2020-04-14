@@ -5,7 +5,6 @@ Created on Thu Jan 16 13:50:57 2020
 
 @author: earsmaf
 
-this is a stupid modification
 """
 
 
@@ -60,10 +59,13 @@ lon_Sid = 151.2093
 lat_Quito = -0.1807
 colat_Quito = 90-lat_Quito
 lon_Quito = -78.4675
+#Black Sea (LAschamp excursion from Nowaczyk 2012)
+lat_M72_5_22 = 42.225500 
+lon_M72_5_22 = 36.492500
 # specific locations
-lat_locations = np.array([lat_Quito, lat_SUL, lat_Sid]) # equator, sulmona, southern Hemisphere
+lat_locations = np.array([lat_Quito, lat_SUL, lat_Sid, lat_M72_5_22]) # equator, sulmona, southern Hemisphere
 theta_locations = -lat_locations*np.pi/180. + np.pi/2
-lon_locations = np.array([lon_Quito, lon_SUL, lon_Sid])
+lon_locations = np.array([lon_Quito, lon_SUL, lon_Sid, lon_M72_5_22])
 phi_locations = lon_locations*np.pi/180.
 
 #input for maps
@@ -100,7 +102,7 @@ cols = len(x[0])
 rows = len(coeffs_B)
 coeffs_B = np.reshape(coeffs_B,(rows/cols, cols))
 
-Lmax = -1+np.sqrt(cols) # shouold be cols-1+1
+Lmax = int(-1+np.sqrt(cols)) # shouold be cols-1+1
     
 #####################################
 # coefficients are in nanoTeslas!!!!
@@ -422,8 +424,14 @@ plt.savefig(folder+'figures/LSMOD1_opt_dipole.pdf',bbox_inches='tight',pad_inche
 
 
 
-# Inclination time-series
+# Inclination/declination time-series
 inclination_locations = np.arctan(np.divide(-Br_locations,np.sqrt(Bt_locations**2+Bp_locations**2)))*180/np.pi
+declination_locations = np.arctan(np.divide(Bp_locations,-Bt_locations))*180/np.pi
+
+# VGP time series
+# black sea location:
+VGP_lat_M72_5_22, VGP_lon_M72_5_22 = subs.VGP_from_DI(inclination_locations[:,3],declination_locations[:,3],lat_M72_5_22,lon_M72_5_22)
+
 
 fig_i,ax_i =  plt.subplots(figsize=(8,5))
 # add vertical lines for the transitional period
@@ -442,7 +450,7 @@ plt.ylabel(r'Max $|dI/dt|$ ($deg/yr$)')
 ax_i.set_xlim(age[-1], age[0])
 ax_i.legend(fontsize=10,loc='upper left')
 plt.title('Max inclination rate of change at locations')
-plt.show
+plt.show()
 plt.savefig(folder+'figures/LSMOD1_opt_inclinations.pdf',bbox_inches='tight',pad_inches=0.0)
 
 
@@ -601,7 +609,7 @@ axs[0].plot(Iopt_fixed_LB[:,0],Iopt_fixed_LB[:,2]* 180.0/np.pi,'--k',marker='s',
           label='unrestricted flow')
 axs[0].plot(Iopt_fixed_LB_columnar[:,0],Iopt_fixed_LB_columnar[:,2]* 180.0/np.pi,'--k',marker='s',markerfacecolor='g',
           label='columnar flow')
-axs[0].set_title('Fixed $L_B=13$',fontsize=15)
+axs[0].set_title('Fixed $L_B=10$',fontsize=15)
 axs[0].set_xlabel('$L_U$')
 #axs[0].set_ylabel('Max $dI/dt$ / (deg/yr)',fontsize=16)
 axs[0].set_xscale('log')
@@ -624,7 +632,7 @@ axs[1].grid(which='both',alpha=0.5)
 
 fig.tight_layout(rect=[0,0, 1, 0.94])
 
-plt.show
+plt.show()
 plt.savefig('dIdt_sensitivity_LSMOD1_42850_SUL.pdf',bbox_inches='tight',pad_inches=0.0)
 
 
@@ -776,7 +784,7 @@ axs[0].plot(tilt_opt_fixed_LB[:,0],tilt_opt_fixed_LB[:,2]* 180.0/np.pi,'--k',mar
           label='unrestricted flow')
 axs[0].plot(tilt_opt_fixed_LB_columnar[:,0],tilt_opt_fixed_LB_columnar[:,2]* 180.0/np.pi,'--k',marker='s',markerfacecolor='g',
           label='columnar flow')
-axs[0].set_title('Fixed $L_B=13$',fontsize=15)
+axs[0].set_title('Fixed $L_B=10$',fontsize=15)
 axs[0].set_xlabel('$L_U$')
 axs[0].set_xscale('log')
 axs[0].set_yscale('log')
@@ -798,7 +806,7 @@ axs[1].grid(which='both',alpha=0.5)
 
 fig.tight_layout(rect=[0,0, 1, 0.94])
 
-plt.show
+plt.show()
 plt.savefig('dtheta_d_dt_sensitivity_LSMOD1_42850.pdf',bbox_inches='tight',pad_inches=0.0)
 
 
@@ -955,7 +963,7 @@ axs[0].plot(Iopt_fixed_LB[:,0],Iopt_fixed_LB[:,2]* 180.0/np.pi,'--k',marker='s',
           label='unrestricted flow')
 axs[0].plot(Iopt_fixed_LB_columnar[:,0],Iopt_fixed_LB_columnar[:,2]* 180.0/np.pi,'--k',marker='s',markerfacecolor='g',
           label='columnar flow')
-axs[0].set_title('Fixed $L_B=13$',fontsize=15)
+axs[0].set_title('Fixed $L_B=10$',fontsize=15)
 axs[0].set_xlabel('$L_U$')
 #axs[0].set_ylabel('Max $dI/dt$ / (deg/yr)',fontsize=16)
 axs[0].set_xscale('log')
@@ -978,7 +986,7 @@ axs[1].grid(which='both',alpha=0.5)
 
 fig.tight_layout(rect=[0,0, 1, 0.94])
 
-plt.show
+plt.show()
 plt.savefig('dIdt_sensitivity_LSMOD1_49000_SUL.pdf',bbox_inches='tight',pad_inches=0.0)
 
 
@@ -1130,7 +1138,7 @@ axs[0].plot(tilt_opt_fixed_LB[:,0],tilt_opt_fixed_LB[:,2]* 180.0/np.pi,'--k',mar
           label='unrestricted flow')
 axs[0].plot(tilt_opt_fixed_LB_columnar[:,0],tilt_opt_fixed_LB_columnar[:,2]* 180.0/np.pi,'--k',marker='s',markerfacecolor='g',
           label='columnar flow')
-axs[0].set_title('Fixed $L_B=13$',fontsize=15)
+axs[0].set_title('Fixed $L_B=10$',fontsize=15)
 axs[0].set_xlabel('$L_U$')
 axs[0].set_xscale('log')
 axs[0].set_yscale('log')
@@ -1152,7 +1160,7 @@ axs[1].grid(which='both',alpha=0.5)
 
 fig.tight_layout(rect=[0,0, 1, 0.94])
 
-plt.show
+plt.show()
 plt.savefig('dtheta_d_dt_sensitivity_LSMOD1_49000.pdf',bbox_inches='tight',pad_inches=0.0)
 
 
@@ -1588,13 +1596,12 @@ ax_i.plot(age,g10/1000.,color='b')
 ax_i.set_xlim(age[-1], age[0])
 ax_i.legend(fontsize=10,loc='lower left')
 plt.title('$g_1^0$')
-plt.show
+plt.show()
 plt.savefig(folder+'figures/g10.pdf',bbox_inches='tight',pad_inches=0.0)
 
 
 
 # Inclination time-series
-inclination_locations = np.arctan(np.divide(-Br_locations,np.sqrt(Bt_locations**2+Bp_locations**2)))*180/np.pi
 
 fig_i,ax_i =  plt.subplots(figsize=(8,5))
 # add vertical lines for the transitional period
@@ -1613,7 +1620,28 @@ plt.ylabel('Inclination / $^\circ$')
 ax_i.set_xlim(age[-1], age[0])
 ax_i.legend(fontsize=10,loc='upper left')
 plt.title('Inclination at locations')
-plt.show
+plt.show()
 plt.savefig(folder+'figures/inclinations.pdf',bbox_inches='tight',pad_inches=0.0)
 
 
+# VGP location at Black Sea location
+
+fig,ax = plt.subplots(figsize=(8,5))
+ax_twin = ax.twinx()
+
+# add vertical lines for the excursions
+ax_twin.plot([age[tML], age[tML]],[-60, 310],'--',color='gray')
+ax_twin.plot([age[tL], age[tL]],[-60, 310],'--',color='gray')
+ax_twin.set_ylim(-60, 310)
+
+ax.set_xlabel('Time / kyr')
+ax.set_ylabel('VGP latitude/$^\circ$',color='b')
+
+ax.plot(age,VGP_lat_M72_5_22,color='b')
+ax.set_xlim(age[-1], age[0])
+ax_twin.plot(age,VGP_lon_M72_5_22,color='r')
+ax_twin.set_ylabel('VGP longitude/$^\circ$',color='r')
+ax_twin.tick_params('y', colors='r')
+ax.tick_params('y', colors='b')
+
+plt.title('VGP location at Black Sea location')

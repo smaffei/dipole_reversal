@@ -108,7 +108,7 @@ Lmax = -1+np.sqrt(cols) # shouold be cols-1+1
 n_instants=coeffs_B.shape[0]
 times = coeffs_B[:,0]   
 # use energy definition from Brown, Korte et al., 2018 (PNAS): eq 1 in the Methods section
-ME_cmb_spectra = np.zeros((n_instants,Lmax+1))
+ME_cmb_spectra = np.zeros((n_instants,int(Lmax)+1))
 ME_cmb_spectra[:,0] = 1.*coeffs_B[:,0]
 ME_a_spectra = ME_cmb_spectra.copy()
 
@@ -300,6 +300,7 @@ time_SUL  = depth_SUL/dep_rate + t0
 
 depth_SUL2_19 = 175.85 # from Sagnbotti 2016
 time_SUL2_19  = depth_SUL2_19/dep_rate + t0
+
 
 
 ########################################
@@ -957,6 +958,13 @@ plt.savefig(folder+'figures/g10.pdf',bbox_inches='tight',pad_inches=0.0)
 # Inclination time-series
 inclination_locations = np.arctan(np.divide(-Br_locations,np.sqrt(Bt_locations**2+Bp_locations**2)))*180/np.pi
 
+
+# Declinations time-series
+declination_locations = np.arctan(np.divide(-Bt_locations,Bp_locations))*180/np.pi
+
+# VGP lat and lon at SUL
+VGP_IMMAB4_SUL_lat, VGP_IMMAB4_SUL_lon = subs.VGP_from_DI(inclination_locations[:,1],declination_locations[:,1],lat_SUL,lon_SUL)
+
 fig_i,ax_i =  plt.subplots(figsize=(8,5))
 # add vertical lines for the transitional period
 ax_i.plot([times[twrite], times[twrite]],[-90, 90],'--',color='gray')
@@ -980,7 +988,6 @@ plt.savefig(folder+'figures/inclinations.pdf',bbox_inches='tight',pad_inches=0.0
 
 
 # SUL Inclination time-series. IMMAB4 vs Sagnotti
-inclination_locations = np.arctan(np.divide(-Br_locations,np.sqrt(Bt_locations**2+Bp_locations**2)))*180/np.pi
 
 fig_i,ax_i =  plt.subplots(figsize=(8,5))
 # add vertical lines for the transitional period
@@ -1040,8 +1047,28 @@ plt.title('Inclination at SUL')
 plt.show
 plt.savefig(folder+'figures/inclinations_SUL_opt_comp_zoom.pdf',bbox_inches='tight',pad_inches=0.0)
 
+# VGP at SUL, IMMAB4
 
+fig,ax = plt.subplots(figsize=(8,5))
+ax_twin = ax.twinx()
 
+# add vertical lines for the transitional period
+ax_twin.plot([times[twrite], times[twrite]],[-90, 300],'--',color='gray')
+ax_twin.plot([times[tend], times[tend]],[-90, 300],'--',color='gray')
+ax_twin.set_ylim(-90, 300)
+
+ax.set_xlabel('Time / kyr')
+ax.set_ylabel('VGP latitude/$^\circ$',color='b')
+
+ax.plot(times,VGP_IMMAB4_SUL_lat,color='b')
+ax.set_xlim(times[0], times[-1])
+ax_twin.plot(times,VGP_IMMAB4_SUL_lon,color='r')
+ax_twin.set_ylabel('VGP longitude/ $\mu T$',color='r')
+ax_twin.tick_params('y', colors='r')
+ax.tick_params('y', colors='b')
+
+plt.title('VGP location at SUL from IMMAB4')
+plt.show()
 
 
 ######################
@@ -1072,8 +1099,6 @@ ax.tick_params('y', colors='b')
 
 plt.title(r'Max dipole tilt and $g_1^0$ rate of change')
 plt.savefig(folder+'figures/IMMAB4_opt_dipole.pdf',bbox_inches='tight',pad_inches=0.0)
-
-
 
 
 # Inclination time-series

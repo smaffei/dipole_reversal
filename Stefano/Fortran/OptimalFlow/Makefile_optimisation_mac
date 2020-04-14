@@ -1,0 +1,6 @@
+F90 = /opt/anaconda3/pkgs/gfortran_osx-64-4.8.5-h22b1bf0_8/bin/gfortran -ffree-line-length-0 -L/opt/anaconda3/lib -I/opt/anaconda3/include
+dipole_tilt_bound :  dipole_tilt_bound.F90 subs.F90 optimisation_bound.F90
+	$(F90) -I/opt/anaconda3/pkgs/fftw-3.3.8-h1de35cc_3/include -c   subs.F90
+	$(F90) -I/opt/anaconda3/pkgs/fftw-3.3.8-h1de35cc_3/include -c   optimisation_bound.F90
+	$(F90) -o dipole_tilt_bound dipole_tilt_bound.F90 subs.o optimisation_bound.o -lfftw3 
+    
