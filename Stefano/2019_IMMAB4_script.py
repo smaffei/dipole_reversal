@@ -1018,9 +1018,9 @@ for i_loc in range(declination_locations.shape[1]):
 
 fig_i,ax_i =  plt.subplots(figsize=(8,5))
 # add vertical lines for the transitional period
-ax_i.plot([times[twrite], times[twrite]],[-90, 90],'--',color='gray')
-ax_i.plot([times[tend], times[tend]],[-90, 90],'--',color='gray')
-ax_i.set_ylim(-90, 90)
+ax_i.plot([times[twrite], times[twrite]],[-180, 180],'--',color='gray')
+ax_i.plot([times[tend], times[tend]],[-180, 180],'--',color='gray')
+ax_i.set_ylim(-180, 180)
 
 ax_i.plot(times,declination_locations[:,1],color='r',
           label='Sulmona'  )
