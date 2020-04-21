@@ -985,13 +985,6 @@ plt.savefig(folder+'figures/g10.pdf',bbox_inches='tight',pad_inches=0.0)
 # Inclination time-series
 inclination_locations = np.arctan(np.divide(-Br_locations,np.sqrt(Bt_locations**2+Bp_locations**2)))*180/np.pi
 
-
-# Declinations time-series
-declination_locations = np.arctan(np.divide(-Bt_locations,Bp_locations))*180/np.pi
-
-# VGP lat and lon at SUL
-VGP_IMMAB4_SUL_lat, VGP_IMMAB4_SUL_lon = subs.VGP_from_DI(inclination_locations[:,1],declination_locations[:,1],lat_SUL,lon_SUL)
-
 fig_i,ax_i =  plt.subplots(figsize=(8,5))
 # add vertical lines for the transitional period
 ax_i.plot([times[twrite], times[twrite]],[-90, 90],'--',color='gray')
@@ -1011,6 +1004,67 @@ ax_i.legend(fontsize=10,loc='upper left')
 plt.title('Inclination at locations')
 plt.show
 plt.savefig(folder+'figures/inclinations.pdf',bbox_inches='tight',pad_inches=0.0)
+
+
+
+# Declinations time-series
+#declination_locations = np.arctan(np.divide(-Bt_locations,Bp_locations))*180/np.pi
+declination_locations = np.zeros(inclination_locations.shape)
+
+for i_loc in range(declination_locations.shape[1]):
+    for it in range(declination_locations.shape[0]):
+        declination_locations[it,i_loc] = math.atan2(-Bt_locations[it,i_loc],Bp_locations[it,i_loc])*180/np.pi
+
+
+fig_i,ax_i =  plt.subplots(figsize=(8,5))
+# add vertical lines for the transitional period
+ax_i.plot([times[twrite], times[twrite]],[-90, 90],'--',color='gray')
+ax_i.plot([times[tend], times[tend]],[-90, 90],'--',color='gray')
+ax_i.set_ylim(-90, 90)
+
+ax_i.plot(times,declination_locations[:,1],color='r',
+          label='Sulmona'  )
+ax_i.plot(times,declination_locations[:,0],color='b',
+          label='Quito'  )
+ax_i.plot(times,declination_locations[:,2],color='g',
+          label='Sidney'  )
+plt.xlabel('Time / kyr')
+plt.ylabel('Declination / $^\circ$')
+ax_i.set_xlim(times[0], times[-1])
+ax_i.legend(fontsize=10,loc='upper left')
+plt.title('Declination at locations')
+plt.show
+
+# VGP lat and lon at SUL
+VGP_IMMAB4_SUL_lat, VGP_IMMAB4_SUL_lon = subs.VGP_from_DI(inclination_locations[:,1],declination_locations[:,1],lat_SUL,lon_SUL)
+# temporal variations of VGP position (deg/yr or rad/yr)
+dI_IMMAB4_SUL_dt = 0.01*(inclination_locations[1:,1] - inclination_locations[0:-1,1])
+dD_IMMAB4_SUL_dt = 0.01*(declination_locations[1:,1] - declination_locations[0:-1,1])
+dVGP_IMMAB4_SUL_lat_dt_FD = 0.01*(VGP_IMMAB4_SUL_lat[1:] - VGP_IMMAB4_SUL_lat[0:-1])
+dVGP_IMMAB4_SUL_lon_dt_FD = 0.01*(VGP_IMMAB4_SUL_lon[1:] - VGP_IMMAB4_SUL_lon[0:-1])
+Incl_IMMAB4_SUL_C = 0.5*(inclination_locations[1:,1] + inclination_locations[0:-1,1])
+Decl_IMMAB4_SUL_C = 0.5*(declination_locations[1:,1] + declination_locations[0:-1,1])
+times_C = 0.5*(times[1:] + times[0:-1])
+dVGP_IMMAB4_SUL_lat_dt_E, dVGP_IMMAB4_SUL_lon_dt_E = subs.dVGP_dt_from_DI(Incl_IMMAB4_SUL_C,Decl_IMMAB4_SUL_C,lat_SUL,lon_SUL,dI_IMMAB4_SUL_dt,dD_IMMAB4_SUL_dt)
+#dVGP_IMMAB4_SUL_lat_dt_E = dVGP_IMMAB4_SUL_lat_dt_E
+
+
+# test figure: VGP lat and its time derivatives
+fig,ax = plt.subplots(figsize=(8,5))
+ax_twin = ax.twinx()
+
+ax.set_xlabel('Age / ka')
+ax.set_ylabel('VGP latitude/$^\circ$')
+
+ax.plot(times,VGP_IMMAB4_SUL_lat,color='k', label='VGP latitude')
+ax.set_xlim(times[0], times[-1])
+ax_twin.plot(times_C,dVGP_IMMAB4_SUL_lat_dt_E,color='r', label='exact solution')
+ax_twin.plot(times_C,dVGP_IMMAB4_SUL_lat_dt_FD,color='b',label='first differences')
+ax_twin.set_ylabel('VGP latitude rate of change/$^\circ/yr$')
+ax.legend(fontsize=10,loc='upper left')
+ax_twin.legend(fontsize=10,loc='upper right')
+plt.title('VGP latitude and rate of change')
+plt.show()
 
 
 
@@ -1129,8 +1183,6 @@ plt.savefig(folder+'figures/IMMAB4_opt_dipole.pdf',bbox_inches='tight',pad_inche
 
 
 # Inclination time-series
-inclination_locations = np.arctan(np.divide(-Br_locations,np.sqrt(Bt_locations**2+Bp_locations**2)))*180/np.pi
-
 fig_i,ax_i =  plt.subplots(figsize=(8,5))
 # add vertical lines for the transitional period
 ax_i.plot([times[twrite], times[twrite]],[0, 10],'--',color='gray')

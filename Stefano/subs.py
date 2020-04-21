@@ -820,3 +820,75 @@ def VGP_from_DI(Incl,Decl,lat,lon):
     
     return VGP_lat, VGP_lon
         
+
+def dVGP_dt_from_DI(Incl,Decl,lat,lon,dIdt,dDdt):
+    """
+    calculate variations of VGP latitude and longitude (dVGP_lat_dt, dVGP_lon_dt)
+    from temporal variations of Inclination and Declination  (dIdt,dDdt) and
+    and Inclination and Declination themselves (Incl, Decl)
+    measured at the location (lon,lat).
+    
+    All quantities exept lon and lat have to be arrays
+    """
+    
+    lat = np.deg2rad(lat)#np.pi*lat/180
+    lon = np.deg2rad(lon)#np.pi*lon/180
+    Incl = np.deg2rad(Incl)#np.pi*Incl/180
+    Decl = np.deg2rad(Decl)#np.pi*Decl/180
+    dIdt = np.deg2rad(dIdt)
+    dDdt = np.deg2rad(dDdt)
+    
+    VGP_lat= np.zeros(Incl.shape)
+    VGP_lat[:] = np.nan 
+    VGP_lon= np.zeros(Incl.shape)
+    VGP_lon[:] = np.nan 
+    dVGP_lat_dt= np.zeros(Incl.shape)
+    dVGP_lat_dt[:] = np.nan 
+    dVGP_lon_dt= np.zeros(Incl.shape)
+    dVGP_lon_dt[:] = np.nan 
+    
+    p= np.zeros(Incl.shape)
+    p[:] = np.nan     
+    dpdt= np.zeros(Incl.shape)
+    dpdt[:] = np.nan    
+    for i in range(len(Incl)):
+        # relative VGP colat
+        p[i] = np.arctan(2.0 / np.tan(Incl[i]))  
+        if p[i] <0:
+            p[i] = p[i]+np.pi
+        # VGP latitude
+        VGP_lat[i] = np.arcsin( np.sin(lat)*np.cos(p[i]) + np.cos(lat)*np.sin(p[i])*np.cos(Decl[i]) )
+        # major arc distance
+        beta = np.arcsin( np.sin(p[i])*np.sin(Decl[i])/np.cos(VGP_lat[i]) )
+        # VGP longitude
+        if np.cos(p[i])>=np.sin(lat)*np.sin(VGP_lat[i]):
+            VGP_lon[i] = lon + beta
+        else:
+            VGP_lon[i] = lon + np.pi - beta
+            
+        # temporal variations
+        dpdt[i] = - 2. * dIdt[i] / ( 1 + 3*(np.cos(Incl[i]))**2 )
+        dVGP_lat_dt[i] = ( -np.sin(lat)*np.sin(p[i])*dpdt[i] 
+                          + np.cos(lat)*np.cos(p[i])*dpdt[i]*np.cos(Decl[i]) 
+                          - np.cos(lat)*np.sin(p[i])*np.sin(Decl[i])*dDdt[i] ) / np.abs(np.cos(VGP_lat[i]))
+     
+    dVGP_lon_dt = 180 * dVGP_lon_dt/np.pi
+    dVGP_lat_dt = 180 * dVGP_lat_dt/np.pi
+    
+    # test figure: VGP lat and its time derivatives
+    fig,ax = plt.subplots(figsize=(8,5))
+    ax_twin = ax.twinx()
+    
+    ax.set_xlabel('Age / index')
+    ax.set_ylabel('VGP latitude/$^\circ$')
+    
+    ax.plot(p,color='k', label='p')
+    ax_twin.plot(dpdt,color='r', label='dpdt, exact')
+    ax_twin.plot(0.01*(p[1:]-p[0:-1]),color='b', label='dpdt, first differences')
+    ax.legend(fontsize=10,loc='upper left')
+    ax_twin.legend(fontsize=10,loc='upper right')
+    plt.title('p and dpdt')
+    plt.show()
+
+
+    return dVGP_lat_dt, dVGP_lon_dt
