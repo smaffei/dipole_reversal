@@ -851,6 +851,12 @@ def dVGP_dt_from_DI(Incl,Decl,lat,lon,dIdt,dDdt):
     p[:] = np.nan     
     dpdt= np.zeros(Incl.shape)
     dpdt[:] = np.nan    
+    
+    beta= np.zeros(Incl.shape)
+    beta[:] = np.nan     
+    dbetadt= np.zeros(Incl.shape)
+    dbetadt[:] = np.nan    
+    
     for i in range(len(Incl)):
         # relative VGP colat
         p[i] = np.arctan(2.0 / np.tan(Incl[i]))  
@@ -859,19 +865,28 @@ def dVGP_dt_from_DI(Incl,Decl,lat,lon,dIdt,dDdt):
         # VGP latitude
         VGP_lat[i] = np.arcsin( np.sin(lat)*np.cos(p[i]) + np.cos(lat)*np.sin(p[i])*np.cos(Decl[i]) )
         # major arc distance
-        beta = np.arcsin( np.sin(p[i])*np.sin(Decl[i])/np.cos(VGP_lat[i]) )
+        beta[i] = np.arcsin( np.sin(p[i])*np.sin(Decl[i])/np.cos(VGP_lat[i]) )
         # VGP longitude
         if np.cos(p[i])>=np.sin(lat)*np.sin(VGP_lat[i]):
-            VGP_lon[i] = lon + beta
+            VGP_lon[i] = lon + beta[i]
         else:
-            VGP_lon[i] = lon + np.pi - beta
+            VGP_lon[i] = lon + np.pi - beta[i]
             
         # temporal variations
         dpdt[i] = - 2. * dIdt[i] / ( 1 + 3*(np.cos(Incl[i]))**2 )
         dVGP_lat_dt[i] = ( -np.sin(lat)*np.sin(p[i])*dpdt[i] 
                           + np.cos(lat)*np.cos(p[i])*dpdt[i]*np.cos(Decl[i]) 
                           - np.cos(lat)*np.sin(p[i])*np.sin(Decl[i])*dDdt[i] ) / np.abs(np.cos(VGP_lat[i]))
-     
+        
+        dbetadt[i] = ( np.cos(VGP_lat[i])*np.cos(p[i])*dpdt[i]*np.sin(Decl[i])
+                  + np.cos(VGP_lat[i])*np.sin(p[i])*np.cos(Decl[i])*dDdt[i]
+                  + np.sin(p[i])*np.sin(Decl[i])*np.sin(VGP_lat[i])*dVGP_lat_dt[i]  ) / ( np.cos(VGP_lat[i])**2 * np.abs(np.cos(beta[i])) )
+        if np.cos(p[i])>=np.sin(lat)*np.sin(VGP_lat[i]):
+            dVGP_lon_dt[i] = dbetadt[i]
+        else:
+            dVGP_lon_dt[i] = -dbetadt[i]
+            
+            
     dVGP_lon_dt = 180 * dVGP_lon_dt/np.pi
     dVGP_lat_dt = 180 * dVGP_lat_dt/np.pi
     
@@ -882,12 +897,12 @@ def dVGP_dt_from_DI(Incl,Decl,lat,lon,dIdt,dDdt):
     ax.set_xlabel('Age / index')
     ax.set_ylabel('VGP latitude/$^\circ$')
     
-    ax.plot(p,color='k', label='p')
-    ax_twin.plot(dpdt,color='r', label='dpdt, exact')
-    ax_twin.plot(0.01*(p[1:]-p[0:-1]),color='b', label='dpdt, first differences')
+    ax.plot(beta,color='k', label='beta')
+    ax_twin.plot(dbetadt,color='r', label='dbetadt, exact')
+    ax_twin.plot(0.01*(beta[1:]-beta[0:-1]),color='b', label='betapdt, first differences')
     ax.legend(fontsize=10,loc='upper left')
     ax_twin.legend(fontsize=10,loc='upper right')
-    plt.title('p and dpdt')
+    plt.title('beta and dbetadt')
     plt.show()
 
 

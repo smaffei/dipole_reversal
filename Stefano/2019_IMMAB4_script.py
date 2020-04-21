@@ -1049,7 +1049,7 @@ dVGP_IMMAB4_SUL_lat_dt_E, dVGP_IMMAB4_SUL_lon_dt_E = subs.dVGP_dt_from_DI(Incl_I
 #dVGP_IMMAB4_SUL_lat_dt_E = dVGP_IMMAB4_SUL_lat_dt_E
 
 
-# test figure: VGP lat and its time derivatives
+# test figures: VGP lat/lon and their time derivatives
 fig,ax = plt.subplots(figsize=(8,5))
 ax_twin = ax.twinx()
 
@@ -1067,6 +1067,21 @@ plt.title('VGP latitude and rate of change')
 plt.show()
 
 
+fig,ax = plt.subplots(figsize=(8,5))
+ax_twin = ax.twinx()
+
+ax.set_xlabel('Age / ka')
+ax.set_ylabel('VGP longitude/$^\circ$')
+
+ax.plot(times,VGP_IMMAB4_SUL_lon,color='k', label='VGP longitude')
+ax.set_xlim(times[0], times[-1])
+ax_twin.plot(times_C,dVGP_IMMAB4_SUL_lon_dt_E,color='r', label='exact solution')
+ax_twin.plot(times_C,dVGP_IMMAB4_SUL_lon_dt_FD,color='b',label='first differences')
+ax_twin.set_ylabel('VGP longitude rate of change/$^\circ/yr$')
+ax.legend(fontsize=10,loc='upper left')
+ax_twin.legend(fontsize=10,loc='upper right')
+plt.title('VGP longitude and rate of change')
+plt.show()
 
 # SUL Inclination time-series. IMMAB4 vs Sagnotti
 
