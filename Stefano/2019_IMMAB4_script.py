@@ -1209,9 +1209,9 @@ plt.savefig(folder+'figures/IMMAB4_opt_inclinations.pdf',bbox_inches='tight',pad
 
 fig_i,ax_i =  plt.subplots(figsize=(8,5))
 # add vertical lines for the transitional period
-ax_i.plot([times[twrite], times[twrite]],[0, 8000],'--',color='gray')
-ax_i.plot([times[tend], times[tend]],[0, 8000],'--',color='gray')
-ax_i.set_ylim(0, 8000)
+ax_i.plot([times[twrite], times[twrite]],[0, 30],'--',color='gray')
+ax_i.plot([times[tend], times[tend]],[0, 30],'--',color='gray')
+ax_i.set_ylim(0, 30)
 
 ax_i.plot(times,VGPlat_opt_SUL[:,1]*180/np.pi,color='r',)
 plt.xlabel('Time / kyr')
