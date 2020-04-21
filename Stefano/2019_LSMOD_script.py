@@ -451,7 +451,11 @@ plt.savefig(folder+'figures/LSMOD1_opt_dipole.pdf',bbox_inches='tight',pad_inche
 
 # Inclination/declination time-series
 inclination_locations = np.arctan(np.divide(-Br_locations,np.sqrt(Bt_locations**2+Bp_locations**2)))*180/np.pi
-declination_locations = np.arctan(np.divide(Bp_locations,-Bt_locations))*180/np.pi
+declination_locations = np.zeros(inclination_locations.shape)
+
+for i_loc in range(declination_locations.shape[1]):
+    for it in range(declination_locations.shape[0]):
+        declination_locations[it,i_loc] = math.atan2(-Bt_locations[it,i_loc],Bp_locations[it,i_loc])*180/np.pi
 
 # VGP time series
 # black sea location:
@@ -484,9 +488,9 @@ plt.savefig(folder+'figures/LSMOD1_opt_inclinations.pdf',bbox_inches='tight',pad
 fig,ax = plt.subplots(figsize=(8,5))
 
 # add vertical lines for the excursion times
-ax.plot([age[tML], age[tML]],[0.0, 30000],'--',color='gray')
-ax.plot([age[tL], age[tL]],[0.0, 30000],'--',color='gray')
-ax.set_ylim(0.0, 30000)
+ax.plot([age[tML], age[tML]],[0.0, 10],'--',color='gray')
+ax.plot([age[tL], age[tL]],[0.0, 10],'--',color='gray')
+ax.set_ylim(0.0, 10)
 
 ax.set_xlabel('Time / kyr')
 ax.set_ylabel(r'Max $|d\lambda_p/dt|$ ($deg/yr$)')

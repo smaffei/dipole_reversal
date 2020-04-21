@@ -253,8 +253,9 @@ age_dthetadt_IMMAB4   = (774000 + 776000) / 2.0 # central age for it (in yr)
 dVGPlat_dt_SUL_IMMAB4 = np.abs( (58.5598- (-41.962)) / (771200 - 776400) )
 age_dVGPlat_dt_SUL_IMMAB4   = (771200 + 776400) / 2.0 # central age for it (in yr)
 
-
-
+# optimal solution
+dVGPlat_dt_SUL_IMMAB4_opt = 26.786474819337922
+age_dVGPlat_dt_SUL_IMMAB4_opt =776400
 
 #########################################
 ########################################
@@ -479,6 +480,10 @@ age_dthetadt_LSMOD   = (41.000 + 41.115) / 2.0 # central age for it (in yr)
 dVGPlat_dt_BS_LSMOD = np.abs( (87.41- (-25.08)) / (40050 - 41200) )
 age_dVGPlat_dt_BS_LSMOD   = (40.05 + 41.2) / 2.0 # central age for it (in yr)
 
+# optimal solution
+dVGPlat_dt_BS_LSMOD_opt = 9.36626747722275
+age_dVGPlat_dt_BS_LSMOD_opt = 41250
+
 #########################################
 ########################################
 # Baseline: Calsk10
@@ -590,6 +595,14 @@ ax.scatter(age_dthetadt_IMMAB4/1000,dtheta_dt_IMMAB4,
             label='Sulmona basin (Leonhardt & Fabian, 2007)')
 ax.annotate('Dipole tilt (IMMAB4)', (DX+age_dVGPlat_dt_SUL_IMMAB4/1000,dtheta_dt_IMMAB4*AY ) )
 
+# IMMAB4, optimal
+# plot central instant of max variation
+ax.scatter(age_dVGPlat_dt_SUL_IMMAB4_opt/1000,dVGPlat_dt_SUL_IMMAB4_opt,
+           marker='*', s=MS, color='r', edgecolors='k',
+            label='Sulmona basin, optimal (Leonhardt & Fabian, 2007)')
+ax.annotate('Sulmona Basin, optimal (IMMAB4)', (DX+age_dVGPlat_dt_SUL_IMMAB4_opt/1000,dVGPlat_dt_SUL_IMMAB4_opt*AY ) )
+
+
 # Coe, 1995
 
 # plot central instant of max variation
@@ -625,6 +638,12 @@ ax.scatter(age_dVGPlat_dt_BS_LSMOD,dVGPlat_dt_BS_LSMOD,
            marker='*', s=MS, color='k', edgecolors='k',
            label='LSMOD1, VGP (Brown et al., 2018)')
 ax.annotate('Black Sea \n (LSMOD1)', (DX/5+age_dVGPlat_dt_BS_LSMOD,dVGPlat_dt_BS_LSMOD*(AY-1.3) ) )
+
+# LSMOD optimal solution
+ax.scatter(age_dVGPlat_dt_BS_LSMOD_opt/1000,dVGPlat_dt_BS_LSMOD_opt,
+           marker='*', s=MS, color='r', edgecolors='k',
+           label='LSMOD1, VGP optimal')
+ax.annotate('Black Sea, optimal \n (LSMOD1)', (DX/5+age_dVGPlat_dt_BS_LSMOD_opt/1000,dVGPlat_dt_BS_LSMOD_opt*(AY-1.3) ) )
 
 # CALSk10K1B: baseline
 ax.plot([0, 50000],[CALS10K1B_dtheta_d_dt_RMS, CALS10K1B_dtheta_d_dt_RMS],'--',color='brown')
