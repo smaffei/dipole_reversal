@@ -889,7 +889,7 @@ def dVGP_dt_from_DI(Incl,Decl,lat,lon,dIdt,dDdt):
             
     dVGP_lon_dt = 180 * dVGP_lon_dt/np.pi
     dVGP_lat_dt = 180 * dVGP_lat_dt/np.pi
-    
+    """
     # test figure: VGP lat and its time derivatives
     fig,ax = plt.subplots(figsize=(8,5))
     ax_twin = ax.twinx()
@@ -904,6 +904,31 @@ def dVGP_dt_from_DI(Incl,Decl,lat,lon,dIdt,dDdt):
     ax_twin.legend(fontsize=10,loc='upper right')
     plt.title('beta and dbetadt')
     plt.show()
-
+    """
 
     return dVGP_lat_dt, dVGP_lon_dt
+
+
+def local_RoC_from_B(Br,Bt,Bp,Brdot,Btdot,Bpdot,lat,lon):
+    """
+    from the geomagnetic field components (Br,Bt,Bp) and time derivatives (Brdot,Btdot,Bpdot)
+    at location (lon,lat), calculate Incl,Decl,VGP position and their rate of change.
+    All quantities are scalar
+    """
+    
+    H = np.sqrt(Bp**2 + Bt**2)
+    F = np.sqrt(Br**2 + Bt**2 + Bp**2)
+    
+    Incl = np.arctan(np.divide(-Br,np.sqrt(Bt**2+Bp**2)))*180/np.pi
+    Decl = math.atan2(-Bt,Bp)*180/np.pi
+    VGP_lat, VGP_lon = VGP_from_DI([Incl],[Decl],lat,lon)
+    VGP_lon = VGP_lon[0]
+    VGP_lat = VGP_lat[0]
+    
+    dIdt = (Bt*Br*Btdot + Bp*Br*Bpdot - H**2*Brdot) / (H*F**2)
+    dDdt = (Bp*Btdot - Bt*Bpdot) / H**2    
+    dVGP_lat_dt, dVGP_lon_dt = dVGP_dt_from_DI([Incl],[Decl],lat,lon,[dIdt*180/np.pi],[dDdt*180/np.pi])
+    dVGP_lat_dt = dVGP_lat_dt[0]
+    dVGP_lon_dt = dVGP_lon_dt[0]
+
+    return Incl, Decl, VGP_lat, VGP_lon, dIdt, dDdt, dVGP_lat_dt, dVGP_lon_dt

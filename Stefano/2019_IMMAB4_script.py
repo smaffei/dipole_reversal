@@ -383,17 +383,25 @@ TARGET_RMS  = 13
 SCALE_FACTOR = 5e-2
 RESTRICTION  = 0
 ETA          = 0 
+REVERSE      = 0
 
 listing = glob.glob('../models/IMMAB4/*out')
 
 times_it=np.linspace(1,len(listing),len(listing))
 I_opt_SUL = []
+I_opt_SUL_dVGPlat_dt = []
+I_opt_SUL_dVGPlon_dt = []
+I_opt_SUL_dDdt = []
+
 I_opt_Sid = []
 I_opt_Quito = []
 tilt_opt = []
 g10_opt = []
 
 # optimise for inclination at SUL
+filename_I_opt_SUL_dVGPlat_dt = ('dIdt_SUL_IMMAB4_dVGPlat_dt_timeseries.txt')
+filename_I_opt_SUL_dVGPlon_dt = ('dIdt_SUL_IMMAB4_dVGPlon_dt_timeseries.txt')
+filename_I_opt_SUL_dDdt = ('dIdt_SUL_IMMAB4_dDdt_timeseries.txt')
 filename_I_opt_SUL = ('dIdt_SUL_IMMAB4_timeseries.txt')
 try:
     I_opt_SUL = np.loadtxt(filename_I_opt_SUL)
@@ -411,14 +419,33 @@ if I_opt_SUL == []:
         line=opt_file.readline()
         x = [list(map(float, line.split() ))]
         opt_file.close()
+        # store result in array
         I_opt_SUL=np.append(I_opt_SUL,[it, x[0][0]])
         # calculate VGP rate of change
-        
+        FLOW = './OPTIMAL_FLOW.DAT'
+        subs.write_calc_SV_input('input_calc_SV',LMAX_U,LMAX_B_OBS,FLOW,MODEL,REVERSE)
+        os.system('./calc_SV < input_calc_SV')
+        coeffsBdot = subs.read_coeffs('./SV.DAT',0,LMAX_B_OBS+LMAX_U)        
+        Br_dot, Bt_dot, Bp_dot=SH_library.calcB(coeffsBdot,np.array([colat_SUL*np.pi/180.0]),np.array([lon_SUL*np.pi/180.0]),r_a,r_a)
+        Incl, Decl, VGP_lat, VGP_lon, dIdt, dDdt, dVGP_lat_dt, dVGP_lon_dt = subs.local_RoC_from_B(Br_locations[it-1,1],Bt_locations[it-1,1],Bp_locations[it-1,1],Br_dot,Bt_dot,Bp_dot,lat_SUL,lon_SUL)
+        # store result in array
+        I_opt_SUL_dVGPlat_dt = np.append(I_opt_SUL_dVGPlat_dt,[it,dVGP_lat_dt])
+        I_opt_SUL_dVGPlon_dt = np.append(I_opt_SUL_dVGPlon_dt,[it,dVGP_lon_dt])
+        I_opt_SUL_dDdt= np.append(I_opt_SUL_dDdt,[it,dDdt]) # this is in rad/yr
+
         os.system('rm *DAT')
         
     I_opt_SUL = np.reshape(I_opt_SUL,(len(I_opt_SUL)/2, 2))     
     np.savetxt(filename_I_opt_SUL,I_opt_SUL,fmt='%6d %.10f')
 
+    I_opt_SUL_dVGPlat_dt = np.reshape(I_opt_SUL_dVGPlat_dt,(len(I_opt_SUL_dVGPlat_dt)/2, 2))     
+    np.savetxt(filename_I_opt_SUL_dVGPlat_dt,I_opt_SUL_dVGPlat_dt,fmt='%6d %.10f')
+
+    I_opt_SUL_dVGPlon_dt = np.reshape(I_opt_SUL_dVGPlon_dt,(len(I_opt_SUL_dVGPlon_dt)/2, 2))     
+    np.savetxt(filename_I_opt_SUL_dVGPlon_dt,I_opt_SUL_dVGPlon_dt,fmt='%6d %.10f')
+
+    I_opt_SUL_dDdt = np.reshape(I_opt_SUL_dDdt,(len(I_opt_SUL_dDdt)/2, 2))     
+    np.savetxt(filename_I_opt_SUL_dDdt,I_opt_SUL,fmt='%6d %.10f')
 
 # optimise for inclination at Sidney
 filename_I_opt_Sid = ('dIdt_Sid_IMMAB4_timeseries.txt')
@@ -1228,7 +1255,8 @@ ax_i.plot([times[twrite], times[twrite]],[0, 30],'--',color='gray')
 ax_i.plot([times[tend], times[tend]],[0, 30],'--',color='gray')
 ax_i.set_ylim(0, 30)
 
-ax_i.plot(times,VGPlat_opt_SUL[:,1]*180/np.pi,color='r',)
+ax_i.plot(times,VGPlat_opt_SUL[:,1]*180/np.pi,color='r',label='optimal VGP lat')
+ax_i.plot(times,np.abs(I_opt_SUL_dVGPlat_dt[:,1]),color='b',label='optimal I')
 plt.xlabel('Time / kyr')
 plt.ylabel(r'Max $|d\lambda_p/dt|$ ($deg/yr$)')
 ax_i.set_xlim(times[0], times[-1])
