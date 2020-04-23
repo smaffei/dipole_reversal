@@ -405,6 +405,9 @@ filename_I_opt_SUL_dDdt = ('dIdt_SUL_IMMAB4_dDdt_timeseries.txt')
 filename_I_opt_SUL = ('dIdt_SUL_IMMAB4_timeseries.txt')
 try:
     I_opt_SUL = np.loadtxt(filename_I_opt_SUL)
+    I_opt_SUL_dVGPlat_dt = np.loadtxt(filename_I_opt_SUL_dVGPlat_dt)
+    I_opt_SUL_dVGPlon_dt = np.loadtxt(filename_I_opt_SUL_dVGPlon_dt)
+    I_opt_SUL_dDdt = np.loadtxt(filename_I_opt_SUL_dDdt)
 except:
     print('no incliation file found')
     
