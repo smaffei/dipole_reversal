@@ -28,7 +28,7 @@ import cartopy.crs as ccrs
 from mpl_toolkits.basemap import Basemap
 from matplotlib import gridspec
 
-
+plt.close('all')
 
 # inputs for animation
 animation_flag = 0 # 0: no animation; 1: create animation  

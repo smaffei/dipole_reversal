@@ -29,7 +29,7 @@ import cartopy.crs as ccrs
 from mpl_toolkits.basemap import Basemap
 from matplotlib import gridspec
 
-
+plt.close('all')
 
 # inputs for animation
 animation_flag = 0 # 0: no animation; 1: create animation  
@@ -552,7 +552,7 @@ ax.set_xlabel('Time / kyr')
 ax.set_ylabel(r'Max $|d\lambda_p/dt|$ ($deg/yr$)')
 
 ax.plot(age,VGPlat_opt_M72_5_22[:,1]*180/np.pi,color='r',label='optimal VGP lat')
-ax_i.plot(times,np.abs(I_opt_M72_5_22_dVGPlat_dt[:,1]),color='b',label='optimal I')
+ax.plot(age,np.abs(I_opt_M72_5_22_dVGPlat_dt[:,1]),color='b',label='optimal I')
 ax.set_xlim(age[-1], age[0])
 ax.tick_params('y')
 

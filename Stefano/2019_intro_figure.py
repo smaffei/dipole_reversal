@@ -43,7 +43,7 @@ lat_C2 = 27.366667
 lon_C2 = 107.183333
 
 
-
+plt.close('all')
 #########################################
 ########################################
 # Sagnotti
@@ -256,6 +256,14 @@ age_dVGPlat_dt_SUL_IMMAB4   = (771200 + 776400) / 2.0 # central age for it (in y
 # optimal solution
 dVGPlat_dt_SUL_IMMAB4_opt = 26.786474819337922
 age_dVGPlat_dt_SUL_IMMAB4_opt =776400
+
+# solution for optimal dIdt
+I_opt_SUL_dVGPlat_dt = 4.0365043002999998
+age_I_opt_SUL = 777400
+
+# optimal dtheta_dt
+IMMAB4_tilt_opt = 1.8747264771166685
+age_IMMAB4_tilt_opt = 774100
 
 #########################################
 ########################################
@@ -484,6 +492,14 @@ age_dVGPlat_dt_BS_LSMOD   = (40.05 + 41.2) / 2.0 # central age for it (in yr)
 dVGPlat_dt_BS_LSMOD_opt = 9.36626747722275
 age_dVGPlat_dt_BS_LSMOD_opt = 41250
 
+# optimal solution if we optimise dIdt
+I_opt_M72_5_22_dVGPlat_dt = 3.7299165168999999
+age_I_opt_M72_5_22 = 41100
+
+# optimal dtheta_dt
+LSMOD_tilt_opt = 2.8668367
+age_LSMOD_tilt_opt = 41000
+
 #########################################
 ########################################
 # Baseline: Calsk10
@@ -540,7 +556,7 @@ Baseline, maybe from  CALS100k (as a continuous line?)
 # plot parmeters
 CS  = 10    # capsize
 ELW = 2     # elinewidth
-MS  = 200    # s (marker size)
+MS  = 70    # s (marker size)
 AY = 1.5    # annotate Y position factor
 DX = 50     # annotate X position displacement
 fig,(ax,ax2) = plt.subplots(1,2,sharey=True,figsize=(8,5))
@@ -555,8 +571,7 @@ fig,(ax,ax2) = plt.subplots(1,2,sharey=True,figsize=(8,5))
 
 # plot central instant of max variation
 ax.scatter(age_fast_C2/1000,dVGPlat_dt_C2,
-           marker='*', s=MS, color='k', edgecolors='k',
-            label='Sanxing Cave (Chou et al., 2018)')
+           marker='^', s=MS, color='k', edgecolors='k')
 ax.annotate('Sanxing Cave', (DX+age_fast_C2/1000,dVGPlat_dt_C2*AY ) )
 
 # Sagnotti et al., 2015
@@ -566,9 +581,8 @@ ax.annotate('Sanxing Cave', (DX+age_fast_C2/1000,dVGPlat_dt_C2*AY ) )
 #            color='r', ecolor='r', capsize=CS, elinewidth=ELW)
 # plot central instant of max variation
 ax.scatter(age_fast_SUL/1000,dVGPlat_dt_SUL,
-           marker='*', s=MS, color='gray', edgecolors='k',
-            label='Sulmona basin (Sagnotti et al., 2014)')
-ax.annotate('Sulmona Basin (2014)', (DX+age_fast_SUL/1000,dVGPlat_dt_SUL*AY ) )
+           marker='^', s=MS, color='gray', edgecolors='k')
+ax.annotate('Sulmona (2014)', (DX+age_fast_SUL/1000,dVGPlat_dt_SUL*AY ) )
 
 # Sagnotti et al., 2016
 # plot temporal span of dataset
@@ -577,31 +591,20 @@ ax.annotate('Sulmona Basin (2014)', (DX+age_fast_SUL/1000,dVGPlat_dt_SUL*AY ) )
 #            color='orange', ecolor='orange', capsize=CS, elinewidth=ELW)
 # plot central instant of max variation
 ax.scatter(age_fast_SUL/1000,dVGPlat_dt_SUL_2,
-           marker='*', s=MS, color='gray', edgecolors='k',
-            label='Sulmona basin (Sagnotti et al., 2015)')
-ax.annotate('Sulmona Basin (2015)', (DX+age_fast_SUL/1000,dVGPlat_dt_SUL_2*AY ) )
+           marker='^', s=MS, color='gray', edgecolors='k')
+ax.annotate('Sulmona (2015)', (DX+age_fast_SUL/1000,dVGPlat_dt_SUL_2*AY ) )
 
 # IMMAB4, VGP at SUlmona
 # plot central instant of max variation
 ax.scatter(age_dVGPlat_dt_SUL_IMMAB4/1000,dVGPlat_dt_SUL_IMMAB4,
-           marker='*', s=MS, color='k', edgecolors='k',
-            label='Sulmona basin (Leonhardt & Fabian, 2007)')
-ax.annotate('Sulmona Basin (IMMAB4)', (DX+age_dVGPlat_dt_SUL_IMMAB4/1000,dVGPlat_dt_SUL_IMMAB4*AY ) )
+           marker='^', s=MS, color='w', edgecolors='k')
+ax.annotate('Sulmona (IMMAB4)', (DX+age_dVGPlat_dt_SUL_IMMAB4/1000,dVGPlat_dt_SUL_IMMAB4*AY ) )
 
 # IMMAB4, dtheta/dt
 # plot central instant of max variation
 ax.scatter(age_dthetadt_IMMAB4/1000,dtheta_dt_IMMAB4,
-           marker='*', s=MS, color='w', edgecolors='k',
-            label='Sulmona basin (Leonhardt & Fabian, 2007)')
+           marker='d', s=MS, color='w', edgecolors='k')
 ax.annotate('Dipole tilt (IMMAB4)', (DX+age_dVGPlat_dt_SUL_IMMAB4/1000,dtheta_dt_IMMAB4*AY ) )
-
-# IMMAB4, optimal
-# plot central instant of max variation
-ax.scatter(age_dVGPlat_dt_SUL_IMMAB4_opt/1000,dVGPlat_dt_SUL_IMMAB4_opt,
-           marker='*', s=MS, color='r', edgecolors='k',
-            label='Sulmona basin, optimal (Leonhardt & Fabian, 2007)')
-ax.annotate('Sulmona Basin, optimal (IMMAB4)', (DX+age_dVGPlat_dt_SUL_IMMAB4_opt/1000,dVGPlat_dt_SUL_IMMAB4_opt*AY ) )
-
 
 # Coe, 1995
 
@@ -610,45 +613,43 @@ ax.annotate('Sulmona Basin, optimal (IMMAB4)', (DX+age_dVGPlat_dt_SUL_IMMAB4_opt
 dangle_dt_Coe = 6*356
 age_Coe=16200
 ax2.scatter(age_Coe,dangle_dt_Coe,
-           marker='*', s=MS, color='gray', edgecolors='k',
-           label='Steens Mountains (Coe et al., 1995)')
-ax2.annotate('Steens Mountains', (DX/5+age_Coe,dangle_dt_Coe*AY ) )
+           marker='^', s=MS, color='gray', edgecolors='k')
+ax2.annotate('Steens Mountains', (15750,dangle_dt_Coe*AY ) )
 
 # Bogue et al., 2010. Sheep Creek (thermal history different from Steens mountain)
 # problem with this point is that I used "indicative" values for initial and final Incl and Decl
 ax2.scatter(age_Bogue,dVGPlat_dt_SC,
-           marker='*', s=MS, color='k', edgecolors='k',
-           label='Sheep Creek (Bogue et al., 2010)')
+           marker='^', s=MS, color='k', edgecolors='k')
 ax2.annotate('Sheep Creek', (DX/5+age_Bogue,dVGPlat_dt_SC*AY ) )
 
 # Nowaczyk 2012. Black Sea Laschamp excursion
 ax.scatter(age_fast_M72_5_22,dVGP_lat_dt_M72_5_22,
-           marker='*', s=MS, color='k', edgecolors='k',
-           label='Black Sea (Nowaczyk et al., 2012)')
+           marker='^', s=MS, color='k', edgecolors='k')
 ax.annotate('Black Sea', (DX/5+age_fast_M72_5_22,dVGP_lat_dt_M72_5_22*AY ) )
 
 # LSMOD. Laschamp excursion
 ax.scatter(age_dthetadt_LSMOD,dtheta_dt_LSMOD,
-           marker='*', s=MS, color='white', edgecolors='k',
-           label='LSMOD1 (Brown et al., 2018)')
+           marker='d', s=MS, color='white', edgecolors='k')
 ax.annotate('Dipole tilt \n (LSMOD1)', (DX/5+age_dthetadt_LSMOD,dtheta_dt_LSMOD*(AY-1.3) ) )
 
 # LSMOD. Laschamp excursion
 ax.scatter(age_dVGPlat_dt_BS_LSMOD,dVGPlat_dt_BS_LSMOD,
-           marker='*', s=MS, color='k', edgecolors='k',
-           label='LSMOD1, VGP (Brown et al., 2018)')
+           marker='^', s=MS, color='white', edgecolors='k')
 ax.annotate('Black Sea \n (LSMOD1)', (DX/5+age_dVGPlat_dt_BS_LSMOD,dVGPlat_dt_BS_LSMOD*(AY-1.3) ) )
 
-# LSMOD optimal solution
-ax.scatter(age_dVGPlat_dt_BS_LSMOD_opt/1000,dVGPlat_dt_BS_LSMOD_opt,
-           marker='*', s=MS, color='r', edgecolors='k',
-           label='LSMOD1, VGP optimal')
-ax.annotate('Black Sea, optimal \n (LSMOD1)', (DX/5+age_dVGPlat_dt_BS_LSMOD_opt/1000,dVGPlat_dt_BS_LSMOD_opt*(AY-1.3) ) )
 
 # CALSk10K1B: baseline
 ax.plot([0, 50000],[CALS10K1B_dtheta_d_dt_RMS, CALS10K1B_dtheta_d_dt_RMS],'--',color='brown')
 ax2.plot([0, 50000],[CALS10K1B_dtheta_d_dt_RMS, CALS10K1B_dtheta_d_dt_RMS],'--',color='brown')
-ax2.annotate('CALSK10K1B', (16200,CALS10K1B_dtheta_d_dt_RMS*(AY-0.1)), color='brown')
+ax2.annotate('CALSK10K1B', (16000,CALS10K1B_dtheta_d_dt_RMS*(AY-0.1)), color='brown')
+
+# fake points for a legend
+ax.scatter(-1000,-1000,
+           marker='d', s=MS, color='w', edgecolors='k',
+            label='Dipole tilt')
+ax.scatter(-1000,-1000,
+           marker='^', s=MS, color='w', edgecolors='k',
+            label='VGP latitude')
 
 
 # create axis spines
@@ -670,18 +671,60 @@ ax2.plot((-d,+d), (1-d,1+d), **kwargs)
 ax2.plot((-d,+d), (-d,+d), **kwargs)
 
 # final touches and legend
-ax2.set_xlim(15000, 17000)
+ax2.set_xlim(15500, 16500)
 ax.set_xlim(0, 1500)
 
 ax.set_xlabel('Age / ka')
-ax.set_ylabel('$d\lambda / dt (^\circ / yr)$')
+#ax.set_ylabel('$d\lambda / dt (^\circ / yr)$')
+ax.set_ylabel('$^\circ / yr$')
 ax.xaxis.set_label_coords(0.5, 0.05, transform=fig.transFigure)
  
 ax.set_ylim(0.001, 10000)
 ax.set_yscale('log')
 #ax.set_xscale('log')
 ax.tick_params('y')
-#ax2.legend(fontsize=10,loc='lower right')
 fig.suptitle('Rapid variations datasets')
+ax.legend(fontsize=9,loc='upper left',title='Rate of change of')
+
+plt.savefig('Rapid_variations_summary_data.pdf',bbox_inches='tight',pad_inches=0.0)
+
+# LSMOD optimal solution
+ax.scatter(age_dVGPlat_dt_BS_LSMOD_opt/1000,dVGPlat_dt_BS_LSMOD_opt,
+           marker='^', s=MS, color='r', edgecolors='k')
+#ax.annotate('Black Sea, \n (LSMOD1)', (DX/5+age_dVGPlat_dt_BS_LSMOD_opt/1000,dVGPlat_dt_BS_LSMOD_opt*(AY-1.3) ) )
+# VGP solution for optimal dIdt
+ax.scatter(age_I_opt_M72_5_22/1000,I_opt_M72_5_22_dVGPlat_dt,
+           marker='v', s=MS, color='r', edgecolors='k')
+#ax.annotate('Black Sea, \n (LSMOD1)', (DX/5+age_I_opt_M72_5_22/1000,I_opt_M72_5_22_dVGPlat_dt*(AY-1.3) ) )
+# optimal dipole tilt rate of change
+ax.scatter(age_LSMOD_tilt_opt/1000,LSMOD_tilt_opt,
+           marker='d', s=MS, color='r', edgecolors='k')
+#ax.annotate('LSMOD1', (DX+age_LSMOD_tilt_opt/1000,LSMOD_tilt_opt*AY ) )
+ax.annotate('Optimal \n (LSMOD1)', (DX+age_dVGPlat_dt_BS_LSMOD_opt/1000,dVGPlat_dt_BS_LSMOD_opt*(AY-1.3) ),
+            color='red')
+
+# IMMAB4, optimal
+# plot central instant of max variation
+ax.scatter(age_dVGPlat_dt_SUL_IMMAB4_opt/1000,dVGPlat_dt_SUL_IMMAB4_opt,
+           marker='^', s=MS, color='r', edgecolors='k')
+#ax.annotate('Sulmona, (IMMAB4)', (DX+age_dVGPlat_dt_SUL_IMMAB4_opt/1000,dVGPlat_dt_SUL_IMMAB4_opt*AY ) )
+ax.annotate('Optimal (IMMAB4)', (DX+age_dVGPlat_dt_SUL_IMMAB4_opt/1000,dVGPlat_dt_SUL_IMMAB4_opt*AY ),
+            color='red')
+# VGP solution for max dIdt
+ax.scatter(age_I_opt_SUL/1000,I_opt_SUL_dVGPlat_dt,
+           marker='v', s=MS, color='r', edgecolors='k')
+#ax.annotate('Sulmona, (IMMAB4)', (DX+age_I_opt_SUL/1000,I_opt_SUL_dVGPlat_dt*AY ) )
+# optimal dipole tilt rate of change
+ax.scatter(age_IMMAB4_tilt_opt/1000,IMMAB4_tilt_opt,
+           marker='d', s=MS, color='r', edgecolors='k')
+#ax.annotate('IMMAB4', (DX+age_IMMAB4_tilt_opt/1000,IMMAB4_tilt_opt*AY ) )
+
+# add optimal solution to legend
+ax.scatter(-1000,-1000,
+           marker='v', s=MS, color='w', edgecolors='k',
+            label='VGP latitude (from $dI/dt$)')
+
+ax.legend(fontsize=9,loc='upper left',title='Rate of change of')
+
 plt.savefig('Rapid_variations_summary.pdf',bbox_inches='tight',pad_inches=0.0)
 plt.show
