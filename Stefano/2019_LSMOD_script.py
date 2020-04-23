@@ -394,14 +394,14 @@ if g10_opt == []:
     
     
 # optimise for rate of change of VGP lat at black sea location    
-VGPlat_opt = []
-filename_VGPlat_opt = ('dVGPlatdt_M72_5_22_LSMOD1_timeseries.txt')
+VGPlat_opt_M72_5_22 = []
+filename_VGPlat_opt_M72_5_22 = ('dVGPlatdt_M72_5_22_LSMOD1_timeseries.txt')
 try:
-    VGPlat_opt = np.loadtxt(filename_VGPlat_opt)
+    VGPlat_opt_M72_5_22 = np.loadtxt(filename_VGPlat_opt_M72_5_22)
 except:
     print('no VGP lat file found')
     
-if VGPlat_opt == []:
+if VGPlat_opt_M72_5_22 == []:
     for it in times_it:
         MODEL = '../models/LSMOD1/'+str(int(it))+'.dat'
         FLAG=7
@@ -412,13 +412,69 @@ if VGPlat_opt == []:
         line=opt_file.readline()
         x = [list(map(float, line.split() ))]
         opt_file.close()
-        VGPlat_opt=np.append(VGPlat_opt,[it, x[0][0]])
+        VGPlat_opt_M72_5_22=np.append(VGPlat_opt_M72_5_22,[it, x[0][0]])
         os.system('rm *DAT')
         
-    VGPlat_opt = np.reshape(VGPlat_opt,(len(VGPlat_opt)/2, 2))     
-    np.savetxt(filename_VGPlat_opt,VGPlat_opt,fmt='%6d %.10f')
+    VGPlat_opt_M72_5_22 = np.reshape(VGPlat_opt_M72_5_22,(len(VGPlat_opt_M72_5_22)/2, 2))     
+    np.savetxt(filename_VGPlat_opt_M72_5_22,VGPlat_opt_M72_5_22,fmt='%6d %.10f')
     
     
+# optimise for inclination at Black Sea location
+I_opt_M72_5_22 = []
+I_opt_M72_5_22_dVGPlat_dt = []
+I_opt_M72_5_22_dVGPlon_dt = []
+I_opt_M72_5_22_dDdt = []
+filename_I_opt_M72_5_22_dVGPlat_dt = ('dIdt_M72_5_22_IMMAB4_dVGPlat_dt_timeseries.txt')
+filename_I_opt_M72_5_22_dVGPlon_dt = ('dIdt_M72_5_22_IMMAB4_dVGPlon_dt_timeseries.txt')
+filename_I_opt_M72_5_22_dDdt = ('dIdt_M72_5_22_IMMAB4_dDdt_timeseries.txt')
+filename_I_opt_M72_5_22 = ('dIdt_M72_5_22_IMMAB4_timeseries.txt')
+try:
+    I_opt_M72_5_22 = np.loadtxt(filename_I_opt_M72_5_22)
+    I_opt_M72_5_22_dVGPlat_dt = np.loadtxt(filename_I_opt_M72_5_22_dVGPlat_dt)
+    I_opt_M72_5_22_dVGPlon_dt = np.loadtxt(filename_I_opt_M72_5_22_dVGPlon_dt)
+    I_opt_M72_5_22_dDdt = np.loadtxt(filename_I_opt_M72_5_22_dDdt)
+except:
+    print('no incliation file found')
+    
+if I_opt_M72_5_22 == []:
+    for it in times_it:
+        MODEL = '../models/LSMOD1/'+str(int(it))+'.dat'
+        FLAG=5
+        REVERSE=0
+        subs.write_optimal_flow_input("input_pedagogical_examples",colat_M72_5_22,lon_M72_5_22,LMAX_U,LMAX_B_OBS,MODEL,TARGET_RMS,SCALE_FACTOR,RESTRICTION,ETA,FLAG)
+        os.system('./dipole_tilt_bound < input_pedagogical_examples')
+        opt_file = open('./OPTIMISED_QUANTITY_DOT.DAT', 'r')
+        opt_file.readline() # header
+        line=opt_file.readline()
+        x = [list(map(float, line.split() ))]
+        opt_file.close()
+        # store result in array
+        I_opt_M72_5_22=np.append(I_opt_M72_5_22,[it, x[0][0]])
+        # calculate VGP rate of change
+        FLOW = './OPTIMAL_FLOW.DAT'
+        subs.write_calc_SV_input('input_calc_SV',LMAX_U,LMAX_B_OBS,FLOW,MODEL,REVERSE)
+        os.system('./calc_SV < input_calc_SV')
+        coeffsBdot = subs.read_coeffs('./SV.DAT',0,LMAX_B_OBS+LMAX_U)        
+        Br_dot, Bt_dot, Bp_dot=SH_library.calcB(coeffsBdot,np.array([colat_M72_5_22*np.pi/180.0]),np.array([lon_M72_5_22*np.pi/180.0]),r_a,r_a)
+        Incl, Decl, VGP_lat, VGP_lon, dIdt, dDdt, dVGP_lat_dt, dVGP_lon_dt = subs.local_RoC_from_B(Br_locations[it-1,1],Bt_locations[it-1,1],Bp_locations[it-1,1],Br_dot,Bt_dot,Bp_dot,lat_M72_5_22,lon_M72_5_22)
+        # store result in array
+        I_opt_M72_5_22_dVGPlat_dt = np.append(I_opt_M72_5_22_dVGPlat_dt,[it,dVGP_lat_dt])
+        I_opt_M72_5_22_dVGPlon_dt = np.append(I_opt_M72_5_22_dVGPlon_dt,[it,dVGP_lon_dt])
+        I_opt_M72_5_22_dDdt= np.append(I_opt_M72_5_22_dDdt,[it,dDdt]) # this is in rad/yr
+
+        os.system('rm *DAT')
+        
+    I_opt_M72_5_22 = np.reshape(I_opt_M72_5_22,(len(I_opt_M72_5_22)/2, 2))     
+    np.savetxt(filename_I_opt_M72_5_22,I_opt_M72_5_22,fmt='%6d %.10f')
+
+    I_opt_M72_5_22_dVGPlat_dt = np.reshape(I_opt_M72_5_22_dVGPlat_dt,(len(I_opt_M72_5_22_dVGPlat_dt)/2, 2))     
+    np.savetxt(filename_I_opt_M72_5_22_dVGPlat_dt,I_opt_M72_5_22_dVGPlat_dt,fmt='%6d %.10f')
+
+    I_opt_M72_5_22_dVGPlon_dt = np.reshape(I_opt_M72_5_22_dVGPlon_dt,(len(I_opt_M72_5_22_dVGPlon_dt)/2, 2))     
+    np.savetxt(filename_I_opt_M72_5_22_dVGPlon_dt,I_opt_M72_5_22_dVGPlon_dt,fmt='%6d %.10f')
+
+    I_opt_M72_5_22_dDdt = np.reshape(I_opt_M72_5_22_dDdt,(len(I_opt_M72_5_22_dDdt)/2, 2))     
+    np.savetxt(filename_I_opt_M72_5_22_dDdt,I_opt_M72_5_22,fmt='%6d %.10f')
 ######################
 # plot optimal time series
 #####################
@@ -495,12 +551,13 @@ ax.set_ylim(0.0, 10)
 ax.set_xlabel('Time / kyr')
 ax.set_ylabel(r'Max $|d\lambda_p/dt|$ ($deg/yr$)')
 
-ax.plot(age,VGPlat_opt[:,1]*180/np.pi,color='b')
+ax.plot(age,VGPlat_opt_M72_5_22[:,1]*180/np.pi,color='r',label='optimal VGP lat')
+ax_i.plot(times,np.abs(I_opt_M72_5_22_dVGPlat_dt[:,1]),color='b',label='optimal I')
 ax.set_xlim(age[-1], age[0])
 ax.tick_params('y')
 
 plt.title(r'Max VGP latitude rate of change')
-plt.savefig(folder+'figures/LSMOD1_opt_VGPlat.pdf',bbox_inches='tight',pad_inches=0.0)
+plt.savefig(folder+'figures/LSMOD1_opt_VGPlat_M72_5_22.pdf',bbox_inches='tight',pad_inches=0.0)
 
 
 
