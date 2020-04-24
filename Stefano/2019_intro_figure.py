@@ -33,6 +33,11 @@ from matplotlib import gridspec
 
 from matplotlib.legend_handler import HandlerLine2D, HandlerTuple
 
+import time
+
+# get current year
+year_str = time.strftime("%Y")
+year_now = int(year_str)
 
 r_cmb = 3485.0e3
 r_a   = 6371.0e3
@@ -505,7 +510,7 @@ age_LSMOD_tilt_opt = 41000
 
 #########################################
 ########################################
-# Baseline: Calsk10
+# Baseline: Cals10k
 ########################################
 ########################################
 
@@ -522,15 +527,16 @@ cols = len(x[0])
 rows = len(coeffs_B)
 CALS10K1B_Coeffs = np.reshape(coeffs_B,(rows/cols, cols))
 
-time_CALSK10K1B = CALS10K1B_Coeffs[:,0]
-g10_CALSK10K1B = CALS10K1B_Coeffs[:,1]
-g11_CALSK10K1B = CALS10K1B_Coeffs[:,2]
-h11_CALSK10K1B = CALS10K1B_Coeffs[:,3]
+time_CALS10K1B = CALS10K1B_Coeffs[:,0]
+age_CALS10K1B  = year_now-time_CALS10K1B
+g10_CALS10K1B = CALS10K1B_Coeffs[:,1]
+g11_CALS10K1B = CALS10K1B_Coeffs[:,2]
+h11_CALS10K1B = CALS10K1B_Coeffs[:,3]
 
 # calculate dipole tilt timeseries, in deg
-CALS10K1B_theta_d = np.arccos(g10_CALSK10K1B/np.sqrt(g10_CALSK10K1B**2+g11_CALSK10K1B**2+h11_CALSK10K1B**2))*180./np.pi
+CALS10K1B_theta_d = np.arccos(g10_CALS10K1B/np.sqrt(g10_CALS10K1B**2+g11_CALS10K1B**2+h11_CALS10K1B**2))*180./np.pi
 # calculate dipole tilt time derivative (deg/yr) wihth first differences
-CALS10K1B_dtheta_d_dt = (CALS10K1B_theta_d[1:] - CALS10K1B_theta_d[0:-1])/ (time_CALSK10K1B[1:] -  time_CALSK10K1B[0:-1])
+CALS10K1B_dtheta_d_dt = (CALS10K1B_theta_d[1:] - CALS10K1B_theta_d[0:-1])/ (time_CALS10K1B[1:] -  time_CALS10K1B[0:-1])
 # get RMS value
 CALS10K1B_dtheta_d_dt_RMS = np.sqrt(np.mean(CALS10K1B_dtheta_d_dt**2))
 
@@ -643,10 +649,10 @@ ax.scatter(age_dVGPlat_dt_BS_LSMOD,dVGPlat_dt_BS_LSMOD,
 ax.annotate('Black Sea \n (LSMOD1)', (DX+age_dVGPlat_dt_BS_LSMOD,dVGPlat_dt_BS_LSMOD*(AYL-0.2) ) )
 
 
-# CALSk10K1B: baseline
+# CALS10K1B: baseline
 ax.plot([0, 50000],[CALS10K1B_dtheta_d_dt_RMS, CALS10K1B_dtheta_d_dt_RMS],'--',color='brown')
 ax2.plot([0, 50000],[CALS10K1B_dtheta_d_dt_RMS, CALS10K1B_dtheta_d_dt_RMS],'--',color='brown')
-ax2.annotate('CALSK10K1B', (16000,CALS10K1B_dtheta_d_dt_RMS*(AY)), color='brown')
+ax2.annotate('CALS10K1B', (16000,CALS10K1B_dtheta_d_dt_RMS*(AY)), color='brown')
 
 # fake points for a legend
 l1 = ax.scatter(-1000,-1000,
@@ -695,7 +701,7 @@ ax.set_ylim(0.001, 10000)
 ax.set_yscale('log')
 #ax.set_xscale('log')
 ax.tick_params('y')
-fig.suptitle('Rapid variations datasets')
+fig.suptitle('Rapid paleomagnetic variations')
 #ax.legend(fontsize=9,loc='upper left',title='Rate of change of')
 leg1=ax.legend([(l1),(l2, l4, l5)], [l1._label,l2._label], numpoints=1,
                handler_map={tuple: HandlerTuple(ndivide=None)},
@@ -759,4 +765,215 @@ leg2=ax.legend([(l1,l2), (l4), (l5), (l6,l7,l8)], ['SH models','data','contested
 ax.add_artist(leg1)
 
 plt.savefig('Rapid_variations_summary.pdf',bbox_inches='tight',pad_inches=0.0)
+plt.show
+
+
+
+
+
+
+
+###############################
+###############################
+# Summary plot, log log version
+###############################
+###############################
+
+'''
+# need to add: 
+
+Directional change during a Miocene R‐N geomagnetic polarity reversal recorded by mafic lava flows, Sheep Creek Range, north central Nevada, USA
+S. W. Bogue  J. M. G. Glen  N. A. Jarboe
+https://agupubs.onlinelibrary.wiley.com/doi/10.1002/2017GC007049
+
+Jarboe, 2010
+
+Baseline, maybe from  CALS100k (as a continuous line?)
+
+# use different filling/sybols to indicate the degree of acceptance of different datasets.
+'''
+
+# plot parmeters
+CS  = 10    # capsize
+ELW = 2     # elinewidth
+MS  = 40    # s (marker size)
+AY = 1.1    # annotate Y position factor
+AYL = 0.6   # for annotation below the marker
+DX = 30     # annotate X position displacement
+#fig,(ax,ax2) = plt.subplots(1,2,sharey=True,figsize=(8,5))
+fig,ax = plt.subplots(1,1,sharey=True,figsize=(8,8))
+
+
+
+# Chou et al. 2018
+# plot temporal span of dataset
+#ax.errorbar((np.nanmin(Age_C2) + np.nanmax(Age_C2))/2/1000,dVGPlat_dt_C2,
+#            xerr=(np.nanmin(Age_C2) - np.nanmax(Age_C2))/2/1000, 
+#            color='b', ecolor='blue', capsize=CS, elinewidth=ELW)
+
+# plot central instant of max variation
+ax.scatter(age_fast_C2/1000,dVGPlat_dt_C2,
+           marker='^', s=MS, color='k', edgecolors='k')
+ax.annotate('Sanxing Cave', (DX+age_fast_C2/1000,dVGPlat_dt_C2*(AYL+0.2) ) )
+
+# Sagnotti et al., 2015
+# plot temporal span of dataset
+#ax.errorbar((np.nanmin(time_SUL) + np.nanmax(time_SUL))/2,dVGPlat_dt_SUL,
+#            xerr=(np.nanmin(time_SUL) - np.nanmax(time_SUL))/2, 
+#            color='r', ecolor='r', capsize=CS, elinewidth=ELW)
+# plot central instant of max variation
+ax.scatter(age_fast_SUL/1000,dVGPlat_dt_SUL,
+           marker='^', s=MS, color='lightgray', edgecolors='k')
+ax.annotate('Sulmona (2014)', (DX+age_fast_SUL/1000,dVGPlat_dt_SUL*AYL ) )
+
+# Sagnotti et al., 2016
+# plot temporal span of dataset
+#ax.errorbar((np.nanmin(time_SUL) + np.nanmax(time_SUL))/2,dVGPlat_dt_SUL_2,
+#            xerr=(np.nanmin(time_SUL) - np.nanmax(time_SUL))/2, 
+#            color='orange', ecolor='orange', capsize=CS, elinewidth=ELW)
+# plot central instant of max variation
+ax.scatter(age_fast_SUL/1000,dVGPlat_dt_SUL_2,
+           marker='^', s=MS, color='lightgray', edgecolors='k')
+ax.annotate('Sulmona (2015)', (DX+age_fast_SUL/1000,dVGPlat_dt_SUL_2*AY ) )
+
+# IMMAB4, VGP at SUlmona
+# plot central instant of max variation
+ax.scatter(age_dVGPlat_dt_SUL_IMMAB4/1000,dVGPlat_dt_SUL_IMMAB4,
+           marker='^', s=MS, color='w', edgecolors='k')
+ax.annotate('Sulmona (IMMAB4)', (DX+age_dVGPlat_dt_SUL_IMMAB4/1000,dVGPlat_dt_SUL_IMMAB4*AY ) )
+
+# IMMAB4, dtheta/dt
+# plot central instant of max variation
+ax.scatter(age_dthetadt_IMMAB4/1000,dtheta_dt_IMMAB4,
+           marker='d', s=MS, color='w', edgecolors='k')
+ax.annotate('IMMAB4', (DX+age_dVGPlat_dt_SUL_IMMAB4/1000,dtheta_dt_IMMAB4*AY ) )
+
+# Coe, 1995
+
+# plot central instant of max variation
+# this is just th e6 degrees per day indicated in the paper: need to translate it to a VGP lat variation
+dangle_dt_Coe = 6*356
+age_Coe=16200
+ax.scatter(age_Coe,dangle_dt_Coe,
+           marker='^', s=MS, color='lightgray', edgecolors='k')
+ax.annotate('Steens Mountains', (15750,dangle_dt_Coe*AY ) )
+
+# Bogue et al., 2010. Sheep Creek (thermal history different from Steens mountain)
+# problem with this point is that I used "indicative" values for initial and final Incl and Decl
+ax.scatter(age_Bogue,dVGPlat_dt_SC,
+           marker='^', s=MS, color='k', edgecolors='k')
+ax.annotate('Sheep Creek', (DX/5+age_Bogue,dVGPlat_dt_SC*AY ) )
+
+# Nowaczyk 2012. Black Sea Laschamp excursion
+ax.scatter(age_fast_M72_5_22,dVGP_lat_dt_M72_5_22,
+           marker='^', s=MS, color='k', edgecolors='k')
+ax.annotate('Black Sea', (DX+age_fast_M72_5_22,dVGP_lat_dt_M72_5_22*AY ) )
+
+# LSMOD. Laschamp excursion
+ax.scatter(age_dthetadt_LSMOD,dtheta_dt_LSMOD,
+           marker='d', s=MS, color='white', edgecolors='k')
+ax.annotate('LSMOD1', (DX+age_dthetadt_LSMOD,dtheta_dt_LSMOD*(AYL) ) )
+
+# LSMOD. Laschamp excursion
+ax.scatter(age_dVGPlat_dt_BS_LSMOD,dVGPlat_dt_BS_LSMOD,
+           marker='^', s=MS, color='white', edgecolors='k')
+ax.annotate('Black Sea \n (LSMOD1)', (DX+age_dVGPlat_dt_BS_LSMOD,dVGPlat_dt_BS_LSMOD*(AYL-0.2) ) )
+
+
+# CALS10K1B: average
+#ax.scatter(np.mean([age_CALS10K1B[-1]/1000., age_CALS10K1B[0]/1000.]),CALS10K1B_dtheta_d_dt_RMS,
+ #          marker='d', s=MS, color='white', edgecolors='k')
+#ax.annotate('CALS10k.1b (rms) ', (AY*np.mean([age_CALS10K1B[-1]/1000., age_CALS10K1B[0]/1000.]),CALS10K1B_dtheta_d_dt_RMS*(AYL-0.2) ) )
+ax.plot([age_CALS10K1B[-1]/1000., age_CALS10K1B[0]/1000.],[CALS10K1B_dtheta_d_dt_RMS, CALS10K1B_dtheta_d_dt_RMS],'k--')
+# fake points for a legend
+l1 = ax.scatter(-1000,-1000,
+           marker='d', s=MS, color='w', edgecolors='k',
+            label='Dipole tilt')
+l2 = ax.scatter(-1000,-1000,
+           marker='^', s=MS, color='w', edgecolors='k',
+            label='VGP latitude')
+l3 = ax.scatter(-1000,-1000,
+           marker='v', s=MS, color='w', edgecolors='k',
+            label='VGP latitude (from $dI/dt$)')
+
+l4 = ax.scatter(-1000,-1000,
+           marker='^', s=MS, color='k', edgecolors='k')
+l5 = ax.scatter(-1000,-1000,
+           marker='^', s=MS, color='lightgray', edgecolors='k')
+           
+
+ax.set_xlabel('Age / ka')
+#ax.set_ylabel('$d\lambda / dt (^\circ / yr)$')
+ax.set_ylabel('$^\circ / yr$')
+#ax.xaxis.set_label_coords(0.5, 0.05, transform=fig.transFigure)
+ 
+ax.set_ylim(0.001, 10000)
+ax.set_xlim(1, 20000)
+ax.set_yscale('log')
+ax.set_xscale('log')
+ax.tick_params('y')
+fig.suptitle('Rapid paleomagnetic variations')
+#ax.legend(fontsize=9,loc='upper left',title='Rate of change of')
+leg1=ax.legend([(l1),(l2, l4, l5)], [l1._label,l2._label], numpoints=1,
+               handler_map={tuple: HandlerTuple(ndivide=None)},
+               fontsize=9,loc='upper left',title='Rate of change of')
+
+leg2=ax.legend([(l1,l2), (l4), (l5)], ['SH models','data','contested data','optimal solution'], numpoints=1,
+               handler_map={tuple: HandlerTuple(ndivide=None)},
+               fontsize=9,loc=(0.011, 0.736),title='Source:')
+ax.add_artist(leg1)
+
+
+plt.savefig('Rapid_variations_summary_data_loglog.pdf',bbox_inches='tight',pad_inches=0.0)
+leg1.remove()
+leg2.remove()
+
+# LSMOD optimal solution
+ax.scatter(age_dVGPlat_dt_BS_LSMOD_opt/1000,dVGPlat_dt_BS_LSMOD_opt,
+           marker='^', s=MS, color='r', edgecolors='k')
+ax.annotate('Black Sea (LSMOD1)', (-DX+age_dVGPlat_dt_BS_LSMOD_opt/1000,dVGPlat_dt_BS_LSMOD_opt*(AY+0.1) ) ,color='red')
+# VGP solution for optimal dIdt
+ax.scatter(age_I_opt_M72_5_22/1000,I_opt_M72_5_22_dVGPlat_dt,
+           marker='v', s=MS, color='r', edgecolors='k')
+ax.annotate('Black Sea (LSMOD1)', (-DX+age_I_opt_M72_5_22/1000,I_opt_M72_5_22_dVGPlat_dt*(AY+0.1) ) ,color='red')
+# optimal dipole tilt rate of change
+ax.scatter(age_LSMOD_tilt_opt/1000,LSMOD_tilt_opt,
+           marker='d', s=MS, color='r', edgecolors='k')
+ax.annotate('LSMOD1', (DX/2+age_LSMOD_tilt_opt/1000,LSMOD_tilt_opt*AYL ) ,color='red' )
+#ax.annotate('Optimal \n (LSMOD1)', (DX+age_dVGPlat_dt_BS_LSMOD_opt/1000,dVGPlat_dt_BS_LSMOD_opt*AY ),
+#            color='red')
+
+# IMMAB4, optimal
+# plot central instant of max variation
+ax.scatter(age_dVGPlat_dt_SUL_IMMAB4_opt/1000,dVGPlat_dt_SUL_IMMAB4_opt,
+           marker='^', s=MS, color='r', edgecolors='k')
+ax.annotate('Sulmona (IMMAB4)', (DX+age_dVGPlat_dt_SUL_IMMAB4_opt/1000,dVGPlat_dt_SUL_IMMAB4_opt*AY ) ,color='red')
+# VGP solution for max dIdt
+ax.scatter(age_I_opt_SUL/1000,I_opt_SUL_dVGPlat_dt,
+           marker='v', s=MS, color='r', edgecolors='k')
+ax.annotate('Sulmona (IMMAB4)', (DX+age_I_opt_SUL/1000,I_opt_SUL_dVGPlat_dt*AY )  ,color='red')
+# optimal dipole tilt rate of change
+ax.scatter(age_IMMAB4_tilt_opt/1000,IMMAB4_tilt_opt,
+           marker='d', s=MS, color='r', edgecolors='k')
+ax.annotate('IMMAB4', (DX+age_IMMAB4_tilt_opt/1000,IMMAB4_tilt_opt*AY )  ,color='red')
+
+# add optimal solution to legend
+l6 = ax.scatter(-1000,-1000,
+           marker='d', s=MS, color='r', edgecolors='k')
+l7 = ax.scatter(-1000,-1000,
+           marker='^', s=MS, color='r', edgecolors='k')
+l8 = ax.scatter(-1000,-1000,
+           marker='v', s=MS, color='r', edgecolors='k')
+
+leg1=ax.legend([(l1, l6),(l2, l4, l5, l7),(l8)], [l1._label,l2._label,l3._label], numpoints=1,
+               handler_map={tuple: HandlerTuple(ndivide=None)},
+               fontsize=9,loc='upper left',title='Rate of change of')
+
+leg2=ax.legend([(l1,l2), (l4), (l5), (l6,l7,l8)], ['SH models','data','contested data','optimal solution'], numpoints=1,
+               handler_map={tuple: HandlerTuple(ndivide=None)},
+               fontsize=9,loc=(0.011, 0.67),title='Source:')
+
+ax.add_artist(leg1)
+
+plt.savefig('Rapid_variations_summary_loglog.pdf',bbox_inches='tight',pad_inches=0.0)
 plt.show
