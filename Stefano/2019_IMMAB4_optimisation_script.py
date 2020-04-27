@@ -541,6 +541,7 @@ if U_file == []:
 # plot the flow
 subs.show_flow(folder_test+"/")
 subs.show_flow_global(folder_test+"/")
+subs.show_flow_streamlines_inst(folder_test,folder_test+'/OPTIMAL_FLOW.DAT',MODEL,r_c,r_a,LMAX_U,1,LMAX_B_OBS,1,t_init/1000.,r'$ mT$',90-colat_SUL,lon_SUL)
 
 # read in the optimal inclination
 fopt = open(folder_test+'/OPTIMISED_QUANTITY_DOT.DAT', 'r')
@@ -619,6 +620,8 @@ h11   = coeffs_MF_tilt_evolved_opt[:,3]
 md    = np.sqrt(np.square(g10) + np.square(g11) + np.square(h11))
 colatitude_tilt_ev_opt = -(90.0 - 180/np.pi * np.arccos(np.divide(g10,md)))
 
+g10_tilt_ev_opt   = coeffs_MF_tilt_evolved_opt[:,1]
+
 
 ################
 # Plots
@@ -645,7 +648,7 @@ ax_t.plot(t_init-times_tilt_ev_opt,colatitude_tilt_ev_opt,color='r',label='times
 
 # highlight the reversal instant
 ax_t.plot(t_init-times_tilt_ev_opt,np.zeros(times_tilt_ev_opt.shape),'--',color='k')
-plt.xlabel('Time / yr')
+plt.xlabel('Age / yr')
 plt.ylabel('Dipole latitude / $^\circ$')
 #ax_t.set_xlim([t_init, t_init-TF/1000.])
 ax_t.set_ylim(-90, 90)
@@ -668,7 +671,7 @@ ax_t.plot(t_init-times_g10_ev_opt,coeffs_MF_g10_evolved_opt[:,1],color='r',label
 
 # highlight the reversal instant
 ax_t.plot(t_init-times_g10_ev_opt,np.zeros(times_g10_ev_opt.shape),'--',color='k')
-plt.xlabel('Time / yr')
+plt.xlabel('Age / yr')
 plt.ylabel('g10 / mT')
 #ax_t.set_xlim([t_init, t_init-TF/1000.])
 ax_t.invert_xaxis()
@@ -705,7 +708,7 @@ ax_i.plot(t_init-times_incl_toroidal_ev_opt,incl_toroidal_ev_opt,'-.',color='r',
           label='timestepping/optimisation, toroidal'  )
 ax_i.plot(t_init-times_VGPlat_ev_opt,incl_ev_VGPlat_opt,color='k',
           label='timestepping/optimisation, optimal VGP latitude'  )
-plt.xlabel('Time / yr')
+plt.xlabel('Age / yr')
 plt.ylabel('Inclination / $^\circ$')
 # highlight the reversal instant
 ax_i.plot(t_init-times_incl_ev_opt,np.zeros(times_incl_ev_opt.shape),'--',color='k')
@@ -731,7 +734,7 @@ ax_i.plot(t_init-times_incl_toroidal_ev_opt,g10_incl_toroidal_ev_opt,'-.',color=
           label='timestepping/optimisation, toroidal'  )
 ax_i.plot(t_init-times_VGPlat_ev_opt,g10_VGPlat_ev_opt,color='k',
           label='timestepping/optimisation, optimal VGP latitude'  )
-plt.xlabel('Time / yr')
+plt.xlabel('Age / yr')
 plt.ylabel('g10 / mT')
 # highlight the reversal instant
 ax_i.plot(t_init-times_incl_ev_opt,np.zeros(times_incl_ev_opt.shape),'--',color='k')
@@ -743,3 +746,25 @@ ax_i.legend(fontsize=10,loc='bottom right')
 plt.title('$g_1^0$ [mT]')
 plt.show
 plt.savefig('g10_inclinations_IMMAB4_770.pdf',bbox_inches='tight',pad_inches=0.0)
+
+# just the fastest, compare optimal inclination with optimal dipole tilt
+
+fig_i,ax_i =  plt.subplots(figsize=(8,5))
+
+
+ax_i.plot((t_init-times_incl_ev_opt)/1000.,g10_incl_ev_opt,color='r',
+          label='optimal inclination at SUL'  )
+ax_i.plot((t_init-times_tilt_ev_opt)/1000.,g10_tilt_ev_opt,color='b',
+          label='optimal dipole tilt'  )
+plt.xlabel('Age / kyr')
+plt.ylabel('g10 / mT')
+# highlight the reversal instant
+#ax_i.plot(t_init-times_incl_ev_opt,np.zeros(times_incl_ev_opt.shape),'--',color='k')
+#ax_i.set_xlim([t_init, t_init-TF/1000.])
+ax_i.invert_xaxis()
+
+#ax_i.set_xlim(times[0], times[-1])
+ax_i.legend(fontsize=10,loc='bottom right')
+#plt.title('$g_1^0$ [mT]')
+plt.show
+plt.savefig('g10_timestepping_optimisations_IMMAB4_770.pdf',bbox_inches='tight',pad_inches=0.0)

@@ -28,6 +28,9 @@ import cartopy.crs as ccrs
 from mpl_toolkits.basemap import Basemap
 from matplotlib import gridspec
 
+from scipy import interpolate
+from scipy.interpolate import UnivariateSpline
+
 plt.close('all')
 
 # inputs for animation
@@ -301,45 +304,104 @@ time_SUL  = depth_SUL/dep_rate + t0
 depth_SUL2_19 = 175.85 # from Sagnbotti 2016
 time_SUL2_19  = depth_SUL2_19/dep_rate + t0
 
+# calculate VGP locations
+VGP_SUL_lat, VGP_SUL_lon = subs.VGP_from_DI(Incl_SUL,Decl_SUL,lat_SUL,lon_SUL)
 
 
 ########################################
-# Read in Sagnotti's 2015 data
+# Read in Sagnotti's 2016 data
 # taken from reading in figure 13 with WebPlootDigitizer
 ########################################
-SUL_2015_folder = '../datasets/Sagnotti_2015/'
-data_2015_file = SUL_2015_folder + 'Inclination.csv'
+SUL_2016_folder = '../datasets/Sagnotti_2016/'
 
-data_2015 = []
-depth_2015 = []
-Incl_2015 = []
-with open(data_2015_file) as f1:
+# read inclination
+data_2016_file = SUL_2016_folder + 'Inclination.csv'
+
+data_2016 = []
+depth_2016 = []
+Incl_2016 = []
+with open(data_2016_file) as f1:
     readCSV = csv.reader(f1,delimiter=',')
     for row in readCSV:
-        data_2015.append(row)
+        data_2016.append(row)
         # get time stamp of data point
         try:
             time1 = float(row[0])
         except:
             # not a string: probably still in the header
             continue
-        depth_2015 = np.append(depth_2015,time1)
+        depth_2016 = np.append(depth_2016,time1)
         # get inclination data point
         try:
             incl = float(row[1])
         except:
             incl = np.nan
             
-        Incl_2015 = np.append(Incl_2015,incl)
+        Incl_2016 = np.append(Incl_2016,incl)
+
+f1.close()
+
+# read declination
+data_2016_file = SUL_2016_folder + 'Declination.csv'
+
+data_2016_D = []
+depth_2016_D = []
+Decl_2016_D = []
+with open(data_2016_file) as f1:
+    readCSV = csv.reader(f1,delimiter=',')
+    for row in readCSV:
+        data_2016_D.append(row)
+        # get time stamp of data point
+        try:
+            time1_D = float(row[0])
+        except:
+            # not a string: probably still in the header
+            continue
+        depth_2016_D = np.append(depth_2016_D,time1_D)
+        # get inclination data point
+        try:
+            decl = float(row[1])
+        except:
+            decl = np.nan
+            
+        Decl_2016_D = np.append(Decl_2016_D,decl)
 
 f1.close()
 
 # sedimentation rate = 0.28 \pm 0.12 mm / yr = cm/ka
-sed_rate_2015 = 28.0
-time_2015 = - depth_2015 / sed_rate_2015 + time_SUL2_19
+sed_rate_2016 = 28.0
+time_2016 = - depth_2016 / sed_rate_2016 + time_SUL2_19
+time_2016_D = - depth_2016_D / sed_rate_2016 + time_SUL2_19
+
+# interpolate declination on the same temporal grid as inclination
+
+Decl_2016 = np.interp(time_2016[::-1],time_2016_D[::-1],Decl_2016_D[::-1])
+Decl_2016 = Decl_2016[::-1]
+
+# spline interpolation: not really good in the end
+#spl = UnivariateSpline(time_2016_D[::-1],Decl_2016_D[::-1])
+#Decl_2016 = spl(time_2016)
+
+# plot to check things
+fig_i,ax_i =  plt.subplots(figsize=(8,5))
+# add vertical lines for the transitional period
+ax_i.plot(time_2016_D,Decl_2016_D,color='r',label='original')
+ax_i.plot(time_2016,Decl_2016,color='b',label='interp')
+plt.xlabel('Age / kyr')
+plt.ylabel(r'Declination')
+ax_i.set_xlim(time_2016[0], time_2016[-1])
+ax_i.legend(fontsize=10,loc='upper left')
+plt.title('Declination at SUL from Sagnotti et al., 2016')
+plt.show
+
+
+# now we can calculate VGP positions
+
+VGPlat_2016, VGPlon_2016 = subs.VGP_from_DI(Incl_2016,Decl_2016,lat_SUL,lon_SUL)
 
 ##########################################
-# read in my optimal solution
+# read in my optimal solution,
+# calculated from the 2019_IMMAB4_optimisation_script.py
 # (think about putting all in one script)
 ##########################################
 
@@ -369,6 +431,26 @@ for it in range(coeffs_MF_incl_evolved_opt.shape[0]):
     g10_incl_ev_opt[it] = beta[0,2]
     incl_ev_opt[it] = np.arctan(np.divide(-Br_a_incl_ev_opt,np.sqrt(Bt_a_incl_ev_opt**2 + Bp_a_incl_ev_opt**2)))*180/np.pi
 
+##########################################
+# read in my optimal dipole tilt solution,
+# calculated from the 2019_IMMAB4_optimisation_script.py
+# (think about putting all in one script)
+##########################################
+
+folder_timestep = 'IMMAB4_781.8_max_dipole_tilt_timestep_opt_dt1'
+
+coeffs_MF_tilt_evolved_opt = subs.read_MF_file(folder_timestep+'/MF_COEFFS.DAT')
+times_tilt_ev_opt = coeffs_MF_tilt_evolved_opt[:,0]
+
+incl_ev_tilt_opt = np.zeros(times_tilt_ev_opt.shape)
+tilt_ev_opt = np.zeros(times_tilt_ev_opt.shape)
+# calculate inclination time-series
+for it in range(coeffs_MF_tilt_evolved_opt.shape[0]):
+    coeffsB = coeffs_MF_tilt_evolved_opt[it,1:]
+    beta = SH_library.lin2matCoeffs(coeffsB)
+    Br_a_tilt_ev_opt, Bt_a_tilt_ev_opt, Bp_a_tilt_ev_opt=SH_library.calcB(beta,np.array([colat_SUL*np.pi/180.0]),np.array([lon_SUL*np.pi/180.0]),r_a,r_a)
+    tilt_ev_opt[it] = -( 90.0 - 180/np.pi * np.arccos(beta[0,2]/np.sqrt(beta[0,2]**2 + beta[1,2]**2 + beta[1,3]**2)) )
+    incl_ev_tilt_opt[it] = np.arctan(np.divide(-Br_a_tilt_ev_opt,np.sqrt(Bt_a_tilt_ev_opt**2 + Bp_a_tilt_ev_opt**2)))*180/np.pi
 
 ##########################################
 # time-series of optimizes quantities
@@ -979,7 +1061,7 @@ ax_twin.plot([times[twrite], times[twrite]],[0, 40],'--',color='gray')
 ax_twin.plot([times[tend], times[tend]],[0, 40],'--',color='gray')
 ax_twin.set_ylim(0, 40)
 
-ax.set_xlabel('Time / kyr')
+ax.set_xlabel('Age / kyr')
 ax.set_ylabel('Dipole latitude/$^\circ$',color='b')
 
 ax.plot(times,dipole_colatitude,color='b')
@@ -1000,7 +1082,7 @@ fig_i,ax_i =  plt.subplots(figsize=(8,5))
 ax_i.plot([times[twrite], times[twrite]],[-40, 40],'--',color='gray')
 ax_i.plot([times[tend], times[tend]],[-40, 40],'--',color='gray')
 ax_i.set_ylim(-40, 40)
-plt.xlabel('Time / kyr')
+plt.xlabel('Age / kyr')
 plt.ylabel('g10 / $\mu T$')
 
 ax_i.plot(times,g10,color='b')
@@ -1027,7 +1109,7 @@ ax_i.plot(times,inclination_locations[:,0],color='b',
           label='Quito'  )
 ax_i.plot(times,inclination_locations[:,2],color='g',
           label='Sidney'  )
-plt.xlabel('Time / kyr')
+plt.xlabel('Age / kyr')
 plt.ylabel('Inclination / $^\circ$')
 ax_i.set_xlim(times[0], times[-1])
 ax_i.legend(fontsize=10,loc='upper left')
@@ -1058,7 +1140,7 @@ ax_i.plot(times,declination_locations[:,0],color='b',
           label='Quito'  )
 ax_i.plot(times,declination_locations[:,2],color='g',
           label='Sidney'  )
-plt.xlabel('Time / kyr')
+plt.xlabel('Age / kyr')
 plt.ylabel('Declination / $^\circ$')
 ax_i.set_xlim(times[0], times[-1])
 ax_i.legend(fontsize=10,loc='upper left')
@@ -1127,20 +1209,51 @@ ax_i.plot(times,inclination_locations[:,1],color='r',
 ax_i.plot(time_SUL,Incl_SUL,color='k',
           label='Sagnotti et al., 2014'  )
 
-ax_i.plot(time_2015,Incl_2015,color='c',
-          label='Sagnotti et al., 2015'  )
+ax_i.plot(time_2016,Incl_2016,color='c',
+          label='Sagnotti et al., 2016'  )
 
 #ax_i.plot( (t_init-times_incl_ev_opt)/1000.0 ,incl_ev_opt,color='b',
 #          label='timestepping/optimisation'  )
 
 
-plt.xlabel('Time / kyr')
+plt.xlabel('Age / kyr')
 plt.ylabel('Inclination / $^\circ$')
 ax_i.set_xlim(times[0], times[-1])
 ax_i.legend(fontsize=10,loc='bottom right')
 plt.title('Inclination at SUL')
 plt.show
 plt.savefig(folder+'figures/inclinations_SUL.pdf',bbox_inches='tight',pad_inches=0.0)
+
+
+# SUL VGP lat time-series. IMMAB4 (dipole tilt) vs Sagnotti
+
+fig_i,ax_i =  plt.subplots(figsize=(8,5))
+# add vertical lines for the transitional period
+ax_i.plot([times[twrite], times[twrite]],[-90, 90],'--',color='gray')
+ax_i.plot([times[tend], times[tend]],[-90, 90],'--',color='gray')
+ax_i.set_ylim(-90, 90)
+
+
+ax_i.plot(times[0:twrite+1],dipole_colatitude[0:twrite+1],color='r',
+          label='IMMAB4'  )
+
+ax_i.plot(time_SUL-4.363,VGP_SUL_lat,color='k',
+          label='Sagnotti et al., 2014'  )
+
+ax_i.plot(time_2016-4.463,VGPlat_2016,color='c',
+          label='Sagnotti et al., 2016'  )
+
+ax_i.plot( (t_init-times_tilt_ev_opt)/1000.0 ,tilt_ev_opt,'--',color='r',
+          label='optimal solution (dipole colatitude)'  )
+
+
+plt.xlabel('Age / kyr')
+plt.ylabel('$^\circ$')
+ax_i.set_xlim(782.25, 781.3)
+ax_i.legend(fontsize=10,loc='bottom right')
+plt.title('VGP latitude at SUL')
+plt.show
+plt.savefig(folder+'figures/VGPlat_tilt_SUL.pdf',bbox_inches='tight',pad_inches=0.0)
 
 
 
@@ -1158,20 +1271,21 @@ ax_i.plot(times[0:twrite+1],inclination_locations[0:twrite+1,1],color='r',
 ax_i.plot(time_SUL-4.363,Incl_SUL,color='k',
           label='Sagnotti et al., 2014'  )
 
-ax_i.plot(time_2015-4.463,Incl_2015,color='c',
-           label='Sagnotti et al., 2015'  )
+ax_i.plot(time_2016-4.463,Incl_2016,color='c',
+           label='Sagnotti et al., 2016'  )
 
 ax_i.plot( (t_init-times_incl_ev_opt)/1000.0 ,incl_ev_opt,'--',color='r',
           label='optimal solution'  )
 
-
-plt.xlabel('Time / kyr')
+plt.xlabel('Age / kyr')
 plt.ylabel('Inclination / $^\circ$')
 ax_i.set_xlim(782.25, 781.5)
 ax_i.legend(fontsize=10,loc='bottom right')
 plt.title('Inclination at SUL')
 plt.show
 plt.savefig(folder+'figures/inclinations_SUL_opt_comp_zoom.pdf',bbox_inches='tight',pad_inches=0.0)
+
+
 
 # VGP at SUL, IMMAB4
 
@@ -1183,7 +1297,7 @@ ax_twin.plot([times[twrite], times[twrite]],[-90, 300],'--',color='gray')
 ax_twin.plot([times[tend], times[tend]],[-90, 300],'--',color='gray')
 ax_twin.set_ylim(-90, 300)
 
-ax.set_xlabel('Time / kyr')
+ax.set_xlabel('Age / kyr')
 ax.set_ylabel('VGP latitude/$^\circ$',color='b')
 
 ax.plot(times,VGP_IMMAB4_SUL_lat,color='b')
@@ -1213,7 +1327,7 @@ ax_twin.plot([times[twrite], times[twrite]],[0, 0.3],'--',color='gray')
 ax_twin.plot([times[tend], times[tend]],[0, 0.3],'--',color='gray')
 ax_twin.set_ylim(0, 0.3)
 
-ax.set_xlabel('Time / kyr')
+ax.set_xlabel('Age / kyr')
 ax.set_ylabel(r'Max $|d\theta_d/dt|$ ($deg/yr$)',color='b')
 
 ax.plot(times,tilt_opt[:,1]*180/np.pi,color='b')
@@ -1225,6 +1339,35 @@ ax.tick_params('y', colors='b')
 
 plt.title(r'Max dipole tilt and $g_1^0$ rate of change')
 plt.savefig(folder+'figures/IMMAB4_opt_dipole.pdf',bbox_inches='tight',pad_inches=0.0)
+
+
+
+
+# Dipole tilt strength in background
+
+fig,ax = plt.subplots(figsize=(8,5))
+ax_twin = ax.twinx()
+
+# add vertical lines for the transitional period
+ax_twin.plot([times[twrite], times[twrite]],[0, 40],'--',color='gray')
+ax_twin.plot([times[tend], times[tend]],[0, 40],'--',color='gray')
+ax_twin.set_ylim(0, 40)
+
+ax.set_xlabel('Age / kyr')
+ax.set_ylabel(r'Max $|d\theta_d/dt|$ ($deg/yr$)',color='b')
+
+ax.plot(times,tilt_opt[:,1]*180/np.pi,color='b')
+ax.set_xlim(times[0], times[-1])
+ax_twin.plot(times,m1,color='k')
+ax_twin.set_ylabel('Dipole intensity/ $\mu T$',color='k')
+ax_twin.tick_params('y', colors='k')
+ax.tick_params('y', colors='b')
+
+plt.title(r'Max dipole tilt rate of change')
+plt.savefig(folder+'figures/IMMAB4_opt_dipole_background.pdf',bbox_inches='tight',pad_inches=0.0)
+
+
+
 
 
 # Inclination time-series
@@ -1240,13 +1383,40 @@ ax_i.plot(times,I_opt_Quito[:,1]*180/np.pi,color='b',
           label='Quito'  )
 ax_i.plot(times,I_opt_Sid[:,1]*180/np.pi,color='g',
           label='Sidney'  )
-plt.xlabel('Time / kyr')
+plt.xlabel('Age / kyr')
 plt.ylabel(r'Max $|dI/dt|$ ($deg/yr$)')
 ax_i.set_xlim(times[0], times[-1])
 ax_i.legend(fontsize=10,loc='upper left')
 plt.title('Max inclination rate of change at locations')
 plt.show
 plt.savefig(folder+'figures/IMMAB4_opt_inclinations.pdf',bbox_inches='tight',pad_inches=0.0)
+
+
+
+
+
+# Inclination time-series, SUL, dipole strength in background
+fig,ax = plt.subplots(figsize=(8,5))
+ax_twin = ax.twinx()
+
+# add vertical lines for the transitional period
+ax_twin.plot([times[twrite], times[twrite]],[0, 40],'--',color='gray')
+ax_twin.plot([times[tend], times[tend]],[0, 40],'--',color='gray')
+ax_twin.set_ylim(0, 40)
+
+ax.set_xlabel('Age / kyr')
+ax.set_ylabel(r'Max $|dI/dt|$ ($deg/yr$)',color='b')
+
+ax.plot(times,I_opt_SUL[:,1]*180/np.pi,color='b',
+          label='Sulmona'  )
+ax.set_xlim(times[0], times[-1])
+ax_twin.plot(times,m1,color='k')
+ax_twin.set_ylabel('Dipole intensity/ $\mu T$',color='k')
+ax_twin.tick_params('y', colors='k')
+ax.tick_params('y', colors='b')
+
+plt.title('Max inclination rate of change at SUL')
+plt.savefig(folder+'figures/IMMAB4_opt_inclinations_SUL_dipole.pdf',bbox_inches='tight',pad_inches=0.0)
 
 
 # VGP lat
@@ -1260,7 +1430,7 @@ ax_i.set_ylim(0, 30)
 
 ax_i.plot(times,VGPlat_opt_SUL[:,1]*180/np.pi,color='r',label='optimal VGP lat')
 ax_i.plot(times,np.abs(I_opt_SUL_dVGPlat_dt[:,1]),color='b',label='optimal I')
-plt.xlabel('Time / kyr')
+plt.xlabel('Age / kyr')
 plt.ylabel(r'Max $|d\lambda_p/dt|$ ($deg/yr$)')
 ax_i.set_xlim(times[0], times[-1])
 ax_i.legend(fontsize=10,loc='upper left')

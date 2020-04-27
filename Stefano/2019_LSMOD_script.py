@@ -912,15 +912,49 @@ plt.show()
 plt.savefig('dtheta_d_dt_sensitivity_LSMOD1_42850.pdf',bbox_inches='tight',pad_inches=0.0)
 
 
+# plot tilt sensitivity to flow field truncation, unrestricted flow, dipole tilt and inlcination at SUL
+fig, axs = plt.subplots(1, 2, figsize=(10,5))
+fig.suptitle(r'Max $d{\theta}_d/dt$ and $dI/dt$ (in $deg/yr$) (LSMOD1, 42.85 ka)',fontsize = 20)
+
+#ax_i.set_ylim(-90, 90)
+
+axs[0].plot(tilt_opt_fixed_LB[:,0],tilt_opt_fixed_LB[:,2]* 180.0/np.pi,'--k',marker='s',markerfacecolor='b',
+          label=r'$d{\theta}_d/dt$')
+axs[0].plot(tilt_opt_fixed_LB_columnar[:,0],Iopt_fixed_LB_columnar[:,2]* 180.0/np.pi,'--k',marker='s',markerfacecolor='g',
+          label=r'$dI/dt$ at SUL')
+axs[0].set_title('Fixed $L_B=10$',fontsize=15)
+axs[0].set_xlabel('$L_U$')
+axs[0].set_xscale('log')
+axs[0].set_yscale('log')
+axs[0].legend(fontsize=10,loc='lower right')
+axs[0].grid(which='both',alpha=0.5)
+
+# plot tilt sensitivity
+axs[1].plot(tilt_opt_fixed_LU[:,1],tilt_opt_fixed_LU[:,2]* 180.0/np.pi,'--k',marker='s',markerfacecolor='b',
+          label=r'$d{\theta}_d/dt$')
+axs[1].plot(tilt_opt_fixed_LU_columnar[:,1],Iopt_fixed_LU_columnar[:,2]* 180.0/np.pi,'--k',marker='s',markerfacecolor='g',
+          label=r'$dI/dt$ at SUL')
+axs[1].set_title('Fixed $L_U=25$',fontsize=15)
+axs[1].set_xlabel('$L_B$')
+#axs[1].set_ylabel('Max dI/Dt / (deg/yr)')
+axs[1].set_xscale('log')
+axs[1].set_yscale('log')
+axs[1].legend(fontsize=10,loc='lower right')
+axs[1].grid(which='both',alpha=0.5)
+
+fig.tight_layout(rect=[0,0, 1, 0.94])
+
+plt.show()
+plt.savefig('unrestricted_sensitivity_LSMOD1_42850.pdf',bbox_inches='tight',pad_inches=0.0)
 
 
 
 
 
-############################################
+#############################################
 # SENSITIVITY STUDY
 # Optimal inclination from 49 ka LSMOD1 model
-###########################################
+#############################################
 
 
 # sensitivity calculations
@@ -1264,6 +1298,44 @@ fig.tight_layout(rect=[0,0, 1, 0.94])
 
 plt.show()
 plt.savefig('dtheta_d_dt_sensitivity_LSMOD1_49000.pdf',bbox_inches='tight',pad_inches=0.0)
+
+
+
+# plot tilt sensitivity to flow field truncation, unrestricted flow, dipole tilt and inlcination at SUL
+fig, axs = plt.subplots(1, 2, figsize=(10,5))
+fig.suptitle(r'Max $d{\theta}_d/dt$ and $dI/dt$ (in $deg/yr$) (LSMOD1, 49 ka)',fontsize = 20)
+
+#ax_i.set_ylim(-90, 90)
+
+axs[0].plot(tilt_opt_fixed_LB[:,0],tilt_opt_fixed_LB[:,2]* 180.0/np.pi,'--k',marker='s',markerfacecolor='b',
+          label=r'$d{\theta}_d/dt$')
+axs[0].plot(tilt_opt_fixed_LB_columnar[:,0],Iopt_fixed_LB_columnar[:,2]* 180.0/np.pi,'--k',marker='s',markerfacecolor='g',
+          label=r'$dI/dt$ at SUL')
+axs[0].set_title('Fixed $L_B=10$',fontsize=15)
+axs[0].set_xlabel('$L_U$')
+axs[0].set_xscale('log')
+axs[0].set_yscale('log')
+axs[0].legend(fontsize=10,loc='lower right')
+axs[0].grid(which='both',alpha=0.5)
+
+# plot tilt sensitivity
+axs[1].plot(tilt_opt_fixed_LU[:,1],tilt_opt_fixed_LU[:,2]* 180.0/np.pi,'--k',marker='s',markerfacecolor='b',
+          label=r'$d{\theta}_d/dt$')
+axs[1].plot(tilt_opt_fixed_LU_columnar[:,1],Iopt_fixed_LU_columnar[:,2]* 180.0/np.pi,'--k',marker='s',markerfacecolor='g',
+          label=r'$dI/dt$ at SUL')
+axs[1].set_title('Fixed $L_U=25$',fontsize=15)
+axs[1].set_xlabel('$L_B$')
+#axs[1].set_ylabel('Max dI/Dt / (deg/yr)')
+axs[1].set_xscale('log')
+axs[1].set_yscale('log')
+axs[1].legend(fontsize=10,loc='lower right')
+axs[1].grid(which='both',alpha=0.5)
+
+fig.tight_layout(rect=[0,0, 1, 0.94])
+
+plt.show()
+plt.savefig('unrestricted_sensitivity_LSMOD1_49000.pdf',bbox_inches='tight',pad_inches=0.0)
+
 
 
     
@@ -1724,7 +1796,7 @@ ax_i.legend(fontsize=10,loc='upper left')
 plt.title('Inclination at locations')
 plt.show()
 plt.savefig(folder+'figures/inclinations.pdf',bbox_inches='tight',pad_inches=0.0)
-
+   
 
 # VGP location at Black Sea location
 
