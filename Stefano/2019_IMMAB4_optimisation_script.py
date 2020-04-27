@@ -80,8 +80,10 @@ os.system('mkdir '+folder_test)
 os.system('mv *DAT '+folder_test)
 
 # plot the flow
-subs.show_flow(folder_test+"/")
-subs.show_flow_global(folder_test+"/")
+#subs.show_flow(folder_test+"/")
+#subs.show_flow_global(folder_test+"/")
+subs.show_flow_streamlines_inst(folder_test,folder_test+'/OPTIMAL_FLOW.DAT',MODEL,r_c,r_a,LMAX_U,1,LMAX_B_OBS,1,t_init/1000.,r'$ mT$',90-colat_SUL,lon_SUL)
+
 
 # read in the optimal inclination
 fincl = open(folder_test+'/OPTIMISED_QUANTITY_DOT.DAT', 'r')
@@ -122,10 +124,36 @@ if U_file == []:
     os.system('mv LM_SURFACE.DAT LM_SURFACE_reversed.DAT')
     os.system('mv *DAT '+folder_test)
 
+
+
+###############################
+# OPTIMAL INCLINATION, IMMAB4
+# optimise I, max instantaneous
+# at 777.4 ka
+###############################
+ 
+MODEL       = '../models/IMMAB4/167.out' 
+
+folder_test = 'IMMAB4_777.4_max_SUL_inclination'
+# prepare the input file
+subs.write_optimal_flow_input("input_opt",colat_SUL,lon_SUL,LMAX_U,LMAX_B_OBS,MODEL,TARGET_RMS,SCALE_FACTOR,RESTRICTION,ETA,FLAG)
+# run the fortran code
+os.system('./dipole_tilt_bound < input_opt')
+os.system('mkdir '+folder_test)
+os.system('mv *DAT '+folder_test)
+
+# plot the flow
+#subs.show_flow(folder_test+"/")
+#subs.show_flow_global(folder_test+"/")
+subs.show_flow_streamlines_inst(folder_test,folder_test+'/OPTIMAL_FLOW.DAT',MODEL,r_c,r_a,LMAX_U,1,LMAX_B_OBS,1,t_init/1000.,r'$ mT$',90-colat_SUL,lon_SUL)
+
+
+
 ################################################################
 # OPTIMAL REVERSAL TIMES, IMMAB4
 # Optimal inclination , timestepping induction eq.
 ################################################################
+MODEL       = '../models/IMMAB4/123.out' # When the reversal starts: 781.8
 
 ETA     = 0.7
 ALPHA   = 0.6
@@ -201,7 +229,7 @@ for it in range(coeffs_MF_incl_evolved_opt.shape[0]):
     g10_incl_ev_opt[it] = beta[0,2]
     incl_ev_opt[it] = np.arctan(np.divide(-Br_a,np.sqrt(Bt_a**2 + Bp_a**2)))*180/np.pi
 
-subs.show_flow_streamlines(folder_timestep+'/',0,r_c,r_a)
+subs.show_flow_streamlines(folder_timestep+'/',0,r_c,r_a,r'$ mT$',90-colat_SUL,lon_SUL)
 
 
 ################################################################

@@ -540,6 +540,21 @@ CALS10K1B_dtheta_d_dt = (CALS10K1B_theta_d[1:] - CALS10K1B_theta_d[0:-1])/ (time
 # get RMS value
 CALS10K1B_dtheta_d_dt_RMS = np.sqrt(np.mean(CALS10K1B_dtheta_d_dt**2))
 
+
+# plot it
+fig,ax = plt.subplots(figsize=(8,5))
+
+ax.set_xlabel('Age / ka')
+ax.set_ylabel('$^\circ$',color='k')
+
+ax.plot(age_CALS10K1B,CALS10K1B_theta_d,'-',color='k')
+#ax.set_xlim(times[0], times[-1])
+
+#ax.tick_params('y', colors='k')
+plt.show
+plt.title('CALS10K1b dipole tilt')
+
+
 ###############################################################################
 
 ###############################
@@ -800,9 +815,18 @@ MS  = 40    # s (marker size)
 AY = 1.1    # annotate Y position factor
 AYL = 0.6   # for annotation below the marker
 DX = 30     # annotate X position displacement
+AFS = 12     # annotation font size
+LFS = 10    # legend font size
 #fig,(ax,ax2) = plt.subplots(1,2,sharey=True,figsize=(8,5))
 fig,ax = plt.subplots(1,1,sharey=True,figsize=(8,8))
 
+#plt.rc('font', size=SMALL_SIZE)          # controls default text sizes
+plt.rc('axes', titlesize=AFS)     # fontsize of the axes title
+plt.rc('axes', labelsize=AFS)    # fontsize of the x and y labels
+plt.rc('xtick', labelsize=AFS)    # fontsize of the tick labels
+plt.rc('ytick', labelsize=AFS)    # fontsize of the tick labels
+#plt.rc('legend', fontsize=SMALL_SIZE)    # legend fontsize
+#plt.rc('figure', titlesize=BIGGER_SIZE)  # fontsize of the figure title
 
 
 # Chou et al. 2018
@@ -814,7 +838,8 @@ fig,ax = plt.subplots(1,1,sharey=True,figsize=(8,8))
 # plot central instant of max variation
 ax.scatter(age_fast_C2/1000,dVGPlat_dt_C2,
            marker='^', s=MS, color='k', edgecolors='k')
-ax.annotate('Sanxing Cave', (DX+age_fast_C2/1000,dVGPlat_dt_C2*(AYL+0.2) ) )
+ax.annotate('Sanxing Cave', (AY*age_fast_C2/1000,dVGPlat_dt_C2*(AYL) ), 
+            fontsize=AFS )
 
 # Sagnotti et al., 2015
 # plot temporal span of dataset
@@ -824,7 +849,8 @@ ax.annotate('Sanxing Cave', (DX+age_fast_C2/1000,dVGPlat_dt_C2*(AYL+0.2) ) )
 # plot central instant of max variation
 ax.scatter(age_fast_SUL/1000,dVGPlat_dt_SUL,
            marker='^', s=MS, color='lightgray', edgecolors='k')
-ax.annotate('Sulmona (2014)', (DX+age_fast_SUL/1000,dVGPlat_dt_SUL*AYL ) )
+ax.annotate('Sulmona (2014)', (AY*age_fast_SUL/1000,dVGPlat_dt_SUL*AYL ), 
+            fontsize=AFS  )
 
 # Sagnotti et al., 2016
 # plot temporal span of dataset
@@ -834,19 +860,22 @@ ax.annotate('Sulmona (2014)', (DX+age_fast_SUL/1000,dVGPlat_dt_SUL*AYL ) )
 # plot central instant of max variation
 ax.scatter(age_fast_SUL/1000,dVGPlat_dt_SUL_2,
            marker='^', s=MS, color='lightgray', edgecolors='k')
-ax.annotate('Sulmona (2015)', (DX+age_fast_SUL/1000,dVGPlat_dt_SUL_2*AY ) )
+ax.annotate('Sulmona (2015)', (AY*age_fast_SUL/1000,dVGPlat_dt_SUL_2*AY ), 
+            fontsize=AFS  )
 
 # IMMAB4, VGP at SUlmona
 # plot central instant of max variation
 ax.scatter(age_dVGPlat_dt_SUL_IMMAB4/1000,dVGPlat_dt_SUL_IMMAB4,
            marker='^', s=MS, color='w', edgecolors='k')
-ax.annotate('Sulmona (IMMAB4)', (DX+age_dVGPlat_dt_SUL_IMMAB4/1000,dVGPlat_dt_SUL_IMMAB4*AY ) )
+ax.annotate('Sulmona (IMMAB4)', (AY*age_dVGPlat_dt_SUL_IMMAB4/1000,dVGPlat_dt_SUL_IMMAB4*AY ), 
+            fontsize=AFS  )
 
 # IMMAB4, dtheta/dt
 # plot central instant of max variation
 ax.scatter(age_dthetadt_IMMAB4/1000,dtheta_dt_IMMAB4,
            marker='d', s=MS, color='w', edgecolors='k')
-ax.annotate('IMMAB4', (DX+age_dVGPlat_dt_SUL_IMMAB4/1000,dtheta_dt_IMMAB4*AY ) )
+ax.annotate('IMMAB4', (AY*age_dVGPlat_dt_SUL_IMMAB4/1000,dtheta_dt_IMMAB4*AY ), 
+            fontsize=AFS  )
 
 # Coe, 1995
 
@@ -856,34 +885,40 @@ dangle_dt_Coe = 6*356
 age_Coe=16200
 ax.scatter(age_Coe,dangle_dt_Coe,
            marker='^', s=MS, color='lightgray', edgecolors='k')
-ax.annotate('Steens Mountains', (15750,dangle_dt_Coe*AY ) )
+ax.annotate('Steens Mountains', (age_Coe/12,dangle_dt_Coe*AY ), 
+            fontsize=AFS  )
 
 # Bogue et al., 2010. Sheep Creek (thermal history different from Steens mountain)
 # problem with this point is that I used "indicative" values for initial and final Incl and Decl
 ax.scatter(age_Bogue,dVGPlat_dt_SC,
            marker='^', s=MS, color='k', edgecolors='k')
-ax.annotate('Sheep Creek', (DX/5+age_Bogue,dVGPlat_dt_SC*AY ) )
+ax.annotate('Sheep Creek', (age_Bogue/6,dVGPlat_dt_SC*AY ), 
+            fontsize=AFS  )
 
 # Nowaczyk 2012. Black Sea Laschamp excursion
 ax.scatter(age_fast_M72_5_22,dVGP_lat_dt_M72_5_22,
            marker='^', s=MS, color='k', edgecolors='k')
-ax.annotate('Black Sea', (DX+age_fast_M72_5_22,dVGP_lat_dt_M72_5_22*AY ) )
+ax.annotate('Black Sea', (AY*age_fast_M72_5_22,dVGP_lat_dt_M72_5_22*AY ), 
+            fontsize=AFS  )
 
 # LSMOD. Laschamp excursion
 ax.scatter(age_dthetadt_LSMOD,dtheta_dt_LSMOD,
            marker='d', s=MS, color='white', edgecolors='k')
-ax.annotate('LSMOD1', (DX+age_dthetadt_LSMOD,dtheta_dt_LSMOD*(AYL) ) )
+ax.annotate('LSMOD1', (AY*age_dthetadt_LSMOD,dtheta_dt_LSMOD*(AYL) ), 
+            fontsize=AFS  )
 
 # LSMOD. Laschamp excursion
 ax.scatter(age_dVGPlat_dt_BS_LSMOD,dVGPlat_dt_BS_LSMOD,
            marker='^', s=MS, color='white', edgecolors='k')
-ax.annotate('Black Sea \n (LSMOD1)', (DX+age_dVGPlat_dt_BS_LSMOD,dVGPlat_dt_BS_LSMOD*(AYL-0.2) ) )
+ax.annotate('Black Sea \n (LSMOD1)', (AY*age_dVGPlat_dt_BS_LSMOD,dVGPlat_dt_BS_LSMOD*(AYL-0.2) ), 
+            fontsize=AFS  )
 
 
 # CALS10K1B: average
 #ax.scatter(np.mean([age_CALS10K1B[-1]/1000., age_CALS10K1B[0]/1000.]),CALS10K1B_dtheta_d_dt_RMS,
  #          marker='d', s=MS, color='white', edgecolors='k')
-#ax.annotate('CALS10k.1b (rms) ', (AY*np.mean([age_CALS10K1B[-1]/1000., age_CALS10K1B[0]/1000.]),CALS10K1B_dtheta_d_dt_RMS*(AYL-0.2) ) )
+ax.annotate('CALS10k.1b (rms) ', (0.5*np.mean([age_CALS10K1B[-1]/1000., age_CALS10K1B[0]/1000.]),CALS10K1B_dtheta_d_dt_RMS*(AYL) ),
+            fontsize = AFS)
 ax.plot([age_CALS10K1B[-1]/1000., age_CALS10K1B[0]/1000.],[CALS10K1B_dtheta_d_dt_RMS, CALS10K1B_dtheta_d_dt_RMS],'k--')
 # fake points for a legend
 l1 = ax.scatter(-1000,-1000,
@@ -916,11 +951,11 @@ fig.suptitle('Rapid paleomagnetic variations')
 #ax.legend(fontsize=9,loc='upper left',title='Rate of change of')
 leg1=ax.legend([(l1),(l2, l4, l5)], [l1._label,l2._label], numpoints=1,
                handler_map={tuple: HandlerTuple(ndivide=None)},
-               fontsize=9,loc='upper left',title='Rate of change of')
+               fontsize=LFS,loc='upper left',title='Rate of change of')
 
 leg2=ax.legend([(l1,l2), (l4), (l5)], ['SH models','data','contested data','optimal solution'], numpoints=1,
                handler_map={tuple: HandlerTuple(ndivide=None)},
-               fontsize=9,loc=(0.011, 0.736),title='Source:')
+               fontsize=LFS,loc=(0.011, 0.71),title='Source:')
 ax.add_artist(leg1)
 
 
@@ -931,31 +966,43 @@ leg2.remove()
 # LSMOD optimal solution
 ax.scatter(age_dVGPlat_dt_BS_LSMOD_opt/1000,dVGPlat_dt_BS_LSMOD_opt,
            marker='^', s=MS, color='r', edgecolors='k')
-ax.annotate('Black Sea (LSMOD1)', (-DX+age_dVGPlat_dt_BS_LSMOD_opt/1000,dVGPlat_dt_BS_LSMOD_opt*(AY+0.1) ) ,color='red')
+ax.annotate('Black Sea (LSMOD1)', (0.06*age_dVGPlat_dt_BS_LSMOD_opt/1000,dVGPlat_dt_BS_LSMOD_opt*(AY+0.1) ) ,
+            color='red',
+            fontsize=AFS)
 # VGP solution for optimal dIdt
-ax.scatter(age_I_opt_M72_5_22/1000,I_opt_M72_5_22_dVGPlat_dt,
-           marker='v', s=MS, color='r', edgecolors='k')
-ax.annotate('Black Sea (LSMOD1)', (-DX+age_I_opt_M72_5_22/1000,I_opt_M72_5_22_dVGPlat_dt*(AY+0.1) ) ,color='red')
+#ax.scatter(age_I_opt_M72_5_22/1000,I_opt_M72_5_22_dVGPlat_dt,
+#           marker='v', s=MS, color='r', edgecolors='k')
+#ax.annotate('Black Sea (LSMOD1)', (0.06*age_I_opt_M72_5_22/1000,I_opt_M72_5_22_dVGPlat_dt*(AY+0.1) ) ,
+#            color='red',
+#            fontsize=AFS)
 # optimal dipole tilt rate of change
 ax.scatter(age_LSMOD_tilt_opt/1000,LSMOD_tilt_opt,
            marker='d', s=MS, color='r', edgecolors='k')
-ax.annotate('LSMOD1', (DX/2+age_LSMOD_tilt_opt/1000,LSMOD_tilt_opt*AYL ) ,color='red' )
-#ax.annotate('Optimal \n (LSMOD1)', (DX+age_dVGPlat_dt_BS_LSMOD_opt/1000,dVGPlat_dt_BS_LSMOD_opt*AY ),
+ax.annotate('LSMOD1', (AY*age_LSMOD_tilt_opt/1000,LSMOD_tilt_opt*AYL ) ,
+            color='red',
+            fontsize=AFS )
+#ax.annotate('Optimal \n (LSMOD1)', (AY*age_dVGPlat_dt_BS_LSMOD_opt/1000,dVGPlat_dt_BS_LSMOD_opt*AY ),
 #            color='red')
 
 # IMMAB4, optimal
 # plot central instant of max variation
 ax.scatter(age_dVGPlat_dt_SUL_IMMAB4_opt/1000,dVGPlat_dt_SUL_IMMAB4_opt,
            marker='^', s=MS, color='r', edgecolors='k')
-ax.annotate('Sulmona (IMMAB4)', (DX+age_dVGPlat_dt_SUL_IMMAB4_opt/1000,dVGPlat_dt_SUL_IMMAB4_opt*AY ) ,color='red')
+ax.annotate('Sulmona (IMMAB4)', (AY*age_dVGPlat_dt_SUL_IMMAB4_opt/1000,dVGPlat_dt_SUL_IMMAB4_opt*AY ) ,
+            color='red',
+            fontsize=AFS)
 # VGP solution for max dIdt
-ax.scatter(age_I_opt_SUL/1000,I_opt_SUL_dVGPlat_dt,
-           marker='v', s=MS, color='r', edgecolors='k')
-ax.annotate('Sulmona (IMMAB4)', (DX+age_I_opt_SUL/1000,I_opt_SUL_dVGPlat_dt*AY )  ,color='red')
+#ax.scatter(age_I_opt_SUL/1000,I_opt_SUL_dVGPlat_dt,
+#           marker='v', s=MS, color='r', edgecolors='k')
+#ax.annotate('Sulmona (IMMAB4)', (AY*age_I_opt_SUL/1000,I_opt_SUL_dVGPlat_dt*AY )  ,
+#            color='red',
+#            fontsize=AFS)
 # optimal dipole tilt rate of change
 ax.scatter(age_IMMAB4_tilt_opt/1000,IMMAB4_tilt_opt,
            marker='d', s=MS, color='r', edgecolors='k')
-ax.annotate('IMMAB4', (DX+age_IMMAB4_tilt_opt/1000,IMMAB4_tilt_opt*AY )  ,color='red')
+ax.annotate('IMMAB4', (AY*age_IMMAB4_tilt_opt/1000,IMMAB4_tilt_opt*AY )  ,
+            color='red',
+            fontsize=AFS)
 
 # add optimal solution to legend
 l6 = ax.scatter(-1000,-1000,
@@ -965,13 +1012,22 @@ l7 = ax.scatter(-1000,-1000,
 l8 = ax.scatter(-1000,-1000,
            marker='v', s=MS, color='r', edgecolors='k')
 
-leg1=ax.legend([(l1, l6),(l2, l4, l5, l7),(l8)], [l1._label,l2._label,l3._label], numpoints=1,
+#leg1=ax.legend([(l1, l6),(l2, l4, l5, l7),(l8)], [l1._label,l2._label,l3._label], 
+#               numpoints=1,
+#               handler_map={tuple: HandlerTuple(ndivide=None)},
+#               fontsize=LFS,loc='upper left',title='Rate of change of')
+leg1=ax.legend([(l1, l6),(l2, l4, l5, l7)], [l1._label,l2._label], 
+               numpoints=1,
                handler_map={tuple: HandlerTuple(ndivide=None)},
-               fontsize=9,loc='upper left',title='Rate of change of')
+               fontsize=LFS,loc='upper left',title='Rate of change of')
+
 
 leg2=ax.legend([(l1,l2), (l4), (l5), (l6,l7,l8)], ['SH models','data','contested data','optimal solution'], numpoints=1,
                handler_map={tuple: HandlerTuple(ndivide=None)},
-               fontsize=9,loc=(0.011, 0.67),title='Source:')
+               fontsize=LFS,
+#               loc=(0.011, 0.63),
+               loc=(0.011, 0.67),
+               title='Source:')
 
 ax.add_artist(leg1)
 

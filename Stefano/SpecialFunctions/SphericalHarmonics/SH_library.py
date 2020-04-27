@@ -290,4 +290,43 @@ def lin2matCoeffs(beta_lin):
         
     return beta_mat;
         
+def mat2linCoeffs(beta_mat,time):
+    '''
+    convert a series of SH coefficients organised as
+        beta_mat = [[1,0,g10,0],
+                [1,1,g11,h11],
+                ...
+                ]
+    into
+    beta_lin = [g10, g11, h11, g20...]
+    '''
+    Lmax = beta_mat[-1,0]
+    Nc = int((Lmax+1)**2 - 1)
+    beta_lin = np.zeros([Nc,1])
+    ilin = 0
         
+    for ic in range(beta_mat.shape[0]): # cycle over the rows of beta_mat
+    
+        l   = beta_mat[ic,0] 
+        m   = beta_mat[ic,1] 
+        glm = beta_mat[ic,2]
+        hlm = beta_mat[ic,3]
+        
+        beta_lin[ilin] = glm
+
+        if m == 0:
+            ilin = ilin + 1
+        else:
+            beta_lin[ilin +1] = hlm
+            ilin = ilin +2            
+
+        if ilin >= Nc: break
+    
+        m = m+1
+        if m >l:
+            l=l+1
+            m=0
+            
+    beta_lin=np.insert(beta_lin,0,time)
+        
+    return beta_lin;

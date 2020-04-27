@@ -17,6 +17,7 @@ sys.path.insert(1, './SpecialFunctions/SphericalHarmonics/')
 from SH_library import DthSchmidtSH
 from SH_library import DphSchmidtSH
 from SH_library import SchmidtSH
+from SH_library import mat2linCoeffs
 from matplotlib.ticker import ScalarFormatter
 from matplotlib import rc
 import math
@@ -221,7 +222,9 @@ def read_MF_file(filename_MF):
     return coeffs_MF;
 
 def show_flow(folder):
-    
+    """
+    original script that shows local flows on an orthographic projection centered around the 0,0 location
+    """
     input_file = folder+'FLOW_VECTORS_RANDOM.DAT'
     output_file = folder+'flow.pdf'
     
@@ -391,7 +394,7 @@ def show_flow_global(folder):
     plt.close('all')
     return;
 
-def show_flow_streamlines(folder,it,r_cmb,r_a):
+def show_flow_streamlines(folder,it,r_cmb,r_a,units,colatS,lonS):
     '''
     plot flows and CMB field from the data stored in the output of the timestepping/optimisation routines:
         MF_COEFFS.DAT
@@ -531,29 +534,34 @@ def show_flow_streamlines(folder,it,r_cmb,r_a):
     #sinlge plot
     files = []
     
-    fig = plt.figure(figsize=(11, 6))
+    figBr = plt.figure(figsize=(11, 6))
     #    plt.cla()
-    ax = fig.add_subplot(1, 1, 1, projection=ccrs.Mollweide())
-    #ax.gridlines(linewidth=1, alpha=0.5, linestyle='-')
-    cf = ax.contourf(lons, lats, Br_c/1000, # breaks down with contourlevels >=24
+    axBr = figBr.add_subplot(1, 1, 1, projection=ccrs.Mollweide())
+    #axBr.gridlines(linewidth=1, alpha=0.5, linestyle='-')
+    cf = axBr.contourf(lons, lats, Br_c/1000, # breaks down with contourlevels >=24
                 transform=ccrs.PlateCarree(),
                 cmap='coolwarm')
-    ax.contour(lons, lats, Br_c/1000,23, 
+    axBr.contour(lons, lats, Br_c/1000,23, 
                 transform=ccrs.PlateCarree(),
                 colors='k',linewidths=0.5,alpha = 0.3,linestyles = 'solid')
     
     plt.colorbar(cf,fraction=0.03, pad=0.04)
     
-    plt.text(24300000, 0, r'$\mu T$' , fontsize=16)
+    plt.text(24300000, 0, units , fontsize=16)
     lw = 1.9*speed / np.nanmax(speed)
-    ax.streamplot(lons, lats, Vsh, -Ush, 
+    axBr.streamplot(lons, lats, Vsh, -Ush, 
                 transform=ccrs.PlateCarree(),
                 linewidth=lw,
                 arrowsize=0.5,
                 density=6,
                 color='k')
-    ax.coastlines()
-    ax.set_global()
+    axBr.coastlines()
+    axBr.set_global()
+    #station location
+    if colatS != None:
+        axBr.scatter(lonS,colatS,
+                   s=80,edgecolor='k',color='w',alpha=1, zorder=3,marker='^',
+                   transform=ccrs.PlateCarree())
     
     plt.title(U_pol_coeffs[0], y=1.08)
     fname = folder +'Br_CMB_%07d.png' % it
@@ -567,21 +575,21 @@ def show_flow_streamlines(folder,it,r_cmb,r_a):
     it = 0
     files = []
     
-    fig = plt.figure(figsize=(11, 6))
+    figF = plt.figure(figsize=(11, 6))
     #    plt.cla()
-    ax = fig.add_subplot(1, 1, 1, projection=ccrs.Mollweide())
-    #ax.gridlines(linewidth=1, alpha=0.5, linestyle='-')
-    cf = ax.contourf(lons, lats, F_a, # breaks down with contourlevels >=24
+    axF = figF.add_subplot(1, 1, 1, projection=ccrs.Mollweide())
+    #axF.gridlines(linewidth=1, alpha=0.5, linestyle='-')
+    cf = axF.contourf(lons, lats, F_a, # breaks down with contourlevels >=24
                 transform=ccrs.PlateCarree(),
                 cmap='jet')
-    cs=ax.contour(lons, lats, F_a,23, 
+    cs=axF.contour(lons, lats, F_a,23, 
                 transform=ccrs.PlateCarree(),
                 colors='k',linewidths=0.5,alpha = 0.3,linestyles = 'solid')
     plt.colorbar(cf,fraction=0.03, pad=0.04)
     #cf.clim(vmin=-Brmax, vmax=Brmax)
-    plt.text(24300000, 0, r'$ nT$' , fontsize=16)
-    ax.coastlines()
-    ax.set_global()
+    plt.text(24300000, 0, units , fontsize=16)
+    axF.coastlines()
+    axF.set_global()
     
     
     plt.title(U_pol_coeffs[0], y=1.08)
@@ -594,15 +602,15 @@ def show_flow_streamlines(folder,it,r_cmb,r_a):
     #sinlge plot
     files = []
     
-    fig = plt.figure(figsize=(11, 6))
+    figU = plt.figure(figsize=(11, 6))
     #    plt.cla()
-    ax = fig.add_subplot(1, 1, 1, projection=ccrs.Mollweide())
-    #ax.gridlines(linewidth=1, alpha=0.5, linestyle='-')
+    axU = figU.add_subplot(1, 1, 1, projection=ccrs.Mollweide())
+    #axU.gridlines(linewidth=1, alpha=0.5, linestyle='-')
     
-    cf = ax.contourf(lons, lats, speed, # breaks down with contourlevels >=24
+    cf = axU.contourf(lons, lats, speed, # breaks down with contourlevels >=24
                 transform=ccrs.PlateCarree(),
                 cmap='Blues')
-    ax.contour(lons, lats, speed,23, 
+    axU.contour(lons, lats, speed,23, 
                 transform=ccrs.PlateCarree(),
                 colors='k',linewidths=0.5,alpha = 0.3,linestyles = 'solid')
     
@@ -610,14 +618,14 @@ def show_flow_streamlines(folder,it,r_cmb,r_a):
     
 #    plt.text(24300000, 0, r'$\mu T$' , fontsize=16)
     lw = 1.9*speed / np.nanmax(speed)
-    ax.streamplot(lons, lats, Vsh, -Ush, 
+    axU.streamplot(lons, lats, Vsh, -Ush, 
                 transform=ccrs.PlateCarree(),
                 linewidth=lw,
                 arrowsize=0.5,
                 density=6,
                 color='k')
-    ax.coastlines()
-    ax.set_global()
+    axU.coastlines()
+    axU.set_global()
     
     plt.title(U_pol_coeffs[0], y=1.08)
     fname = folder +'U_CMB_%07d.png' % it
@@ -625,7 +633,46 @@ def show_flow_streamlines(folder,it,r_cmb,r_a):
     files.append(fname)
     plt.close()
 
-    return;
+    return
+
+def show_flow_streamlines_inst(folder,flow,model,r_cmb,r_a,LMAX_U,hline_U,LMAX_B_OBS,hline_B,time,units,colatS,lonS):
+    '''
+    plot flows and CMB field from the data stored in the output of the 
+    instantaneous calculation routines:
+        OPTIMAL_FLOW.DAT
+    and from the field model
+
+    INPUT:
+        folder: location of the optimal flow model
+        flow:   optimal flow file (OPTIMAL_FLOW.DAT)
+        model:  file containing the background magnetic field
+    '''
+    
+    # read magnetix field
+    coeffsBmat = read_coeffs(model,hline_B,LMAX_B_OBS)
+    
+    coeffsBlin = mat2linCoeffs(coeffsBmat,time)
+    
+    # read flow coefficients
+    coeffsUmat = read_coeffs(flow,hline_U,LMAX_U)
+    coeffsPOLmat = coeffsUmat[:,0:4]
+    coeffsTORmat = np.zeros(coeffsPOLmat.shape)
+    coeffsTORmat[:,0:2] = coeffsUmat[:,0:2]
+    coeffsTORmat[:,2:4] = coeffsUmat[:,4:6]
+    
+    coeffsPOLlin = mat2linCoeffs(coeffsPOLmat,time)
+    coeffsTORlin = mat2linCoeffs(coeffsTORmat,time)
+    
+    # save to files that show_flow_streamlines accepts
+    np.savetxt(folder+'/MF_COEFFS.DAT', coeffsBlin[None], fmt="%s")
+    np.savetxt(folder+'/U_POL_COEFFS.DAT', coeffsPOLlin[None], fmt="%s")
+    np.savetxt(folder+'/U_TOR_COEFFS.DAT', coeffsTORlin[None], fmt="%s")
+    
+    show_flow_streamlines(folder+"/",0,r_cmb,r_a,units,colatS,lonS)
+    
+    
+    return 
+
 
 def show_flow_spectra(folder):
     # read in coefficients
@@ -691,7 +738,9 @@ def show_flow_spectra(folder):
     return;
 
 def show_global_contourf(LONS,LATS,F,COLORMAP,figname):
-    
+    """
+    global, mollweide map of the field F
+    """
     fig = plt.figure(figsize=(11,6))
         
     #Mollweide projectionfrom scipy.interpolate import griddata
