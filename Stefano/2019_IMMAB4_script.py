@@ -40,7 +40,7 @@ tend   = 231
 ##################################################
 # In Figure 8 of Leonhardt 2007 the start of the 
 # reversal is between t = 781.8 Myr
-# and t = 770.9
+# and t = 781.8
 # I took these values visually from the plot.
 ##################################################
 
@@ -353,7 +353,7 @@ t_init = float(line)*1000
 IMMA_file.close()
 
 
-folder_timestep = 'IMMAB4_770.9_max_SUL_inclination_timestep_opt_dt1'
+folder_timestep = 'IMMAB4_781.8_max_SUL_inclination_timestep_opt_dt1'
 
 coeffs_MF_incl_evolved_opt = subs.read_MF_file(folder_timestep+'/MF_COEFFS.DAT')
 coeffs_SV_incl_evolved_opt = subs.read_MF_file(folder_timestep+'/SV_COEFFS.DAT')

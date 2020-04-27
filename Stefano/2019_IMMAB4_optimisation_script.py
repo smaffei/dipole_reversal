@@ -72,7 +72,7 @@ FLAG         = 5
 
 
  
-folder_test = 'IMMAB4_770.9_max_SUL_inclination'
+folder_test = 'IMMAB4_781.8_max_SUL_inclination'
 # prepare the input file
 subs.write_optimal_flow_input("input_opt",colat_SUL,lon_SUL,LMAX_U,LMAX_B_OBS,MODEL,TARGET_RMS,SCALE_FACTOR,RESTRICTION,ETA,FLAG)
 # run the fortran code
@@ -163,7 +163,7 @@ TF      = 200
 DT      = 1
 REVERSE=  0
 
-folder_timestep = 'IMMAB4_770.9_max_SUL_inclination_timestep_dt1'
+folder_timestep = 'IMMAB4_781.8_max_SUL_inclination_timestep_dt1'
 # prepare the input file
 subs.write_timesteping_input("input_timestepping_CMB",LMAX_U,LMAX_B_OBS,FLOW,MODEL,ETA,ALPHA,T0,TF,DT,REVERSE)
 # run the timestepping fortran code
@@ -196,7 +196,7 @@ for it in range(coeffs_MF_incl_evolved.shape[0]):
 # Optimal inclination, timestepping/opt 
 ################################################################
 
-folder_timestep = 'IMMAB4_770.9_max_SUL_inclination_timestep_opt_dt1'
+folder_timestep = 'IMMAB4_781.8_max_SUL_inclination_timestep_opt_dt1'
 
 FLAG_U_INIT     = 1
 OUT_RATE        = 1
@@ -238,7 +238,7 @@ subs.show_flow_streamlines(folder_timestep+'/',0,r_c,r_a,r'$ mT$',90-colat_SUL,l
 # Optimal inclination, timestepping/opt, REVERSED FLOW
 ################################################################
 
-folder_timestep = 'IMMAB4_770.9_max_SUL_inclination_timestep_opt_dt1_reversed'
+folder_timestep = 'IMMAB4_781.8_max_SUL_inclination_timestep_opt_dt1_reversed'
 
 FLAG_U_INIT     = 1
 OUT_RATE        = 1
@@ -267,7 +267,7 @@ if MF_file == []:
 # Optimal inclination, columnar flow, timestepping/opt 
 ################################################################
 
-folder_timestep = 'IMMAB4_770.9_max_SUL_inclination_columnar_timestep_opt_dt1'
+folder_timestep = 'IMMAB4_781.8_max_SUL_inclination_columnar_timestep_opt_dt1'
 
 RESTRICTION  = 3
 REVERSE      = 0
@@ -308,7 +308,7 @@ for it in range(coeffs_MF_incl_columnar_evolved_opt.shape[0]):
 # Optimal inclination, toroidal flow, timestepping/opt 
 ################################################################
 
-folder_timestep = 'IMMAB4_770.9_max_SUL_inclination_toroidal_timestep_opt_dt1'
+folder_timestep = 'IMMAB4_781.8_max_SUL_inclination_toroidal_timestep_opt_dt1'
 
 RESTRICTION  = 2
 #prepare the input file
@@ -343,6 +343,55 @@ for it in range(coeffs_MF_incl_toroidal_evolved_opt.shape[0]):
 
     
     
+################################################################
+# OPTIMAL REVERSAL TIMES:
+# Optimal VGP lat, timestepping/opt 
+################################################################
+
+folder_timestep = 'IMMAB4_781.8_max_SUL_VGPlat_timestep_opt_dt1'
+
+FLAG=7
+FLAG_U_INIT     = 1
+OUT_RATE        = 1
+REVERSE=1
+#prepare the input file
+subs.write_timesteping_opt_input("input_timestepping_CMB_opt",LMAX_U,LMAX_B_OBS,FLOW,MODEL,FLAG_U_INIT,ETA,ALPHA,T0,TF,DT,REVERSE,colat_SUL,lon_SUL,TARGET_RMS,SCALE_FACTOR,RESTRICTION,FLAG,OUT_RATE)
+# this could be a long run, let's skip it if we find the MF file
+MF_file = []
+try:
+    MF_file = np.loadtxt(folder_timestep+'/MF_COEFFS.DAT')
+except:
+    print('no MF file found')
+    
+if MF_file == []:
+    # run the timestepping fortran code
+    os.system('./timestepping_induction_opt < input_timestepping_CMB_opt')
+    os.system('mkdir '+folder_timestep)
+    os.system('mv *DAT '+folder_timestep)
+    
+# load MF coefficients
+coeffs_MF_VGPlat_evolved_opt = subs.read_MF_file(folder_timestep+'/MF_COEFFS.DAT')
+coeffs_SV_VGPlat_evolved_opt = subs.read_MF_file(folder_timestep+'/SV_COEFFS.DAT')
+times_VGPlat_ev_opt = coeffs_MF_VGPlat_evolved_opt[:,0]
+
+incl_ev_VGPlat_opt = np.zeros(times_VGPlat_ev_opt.shape)
+g10_VGPlat_ev_opt = np.zeros(times_VGPlat_ev_opt.shape)
+# calculate inclination time-series
+for it in range(coeffs_MF_VGPlat_evolved_opt.shape[0]):
+    coeffsB = coeffs_MF_VGPlat_evolved_opt[it,1:]
+    beta = SH_library.lin2matCoeffs(coeffsB)
+    Br_a, Bt_a, Bp_a=SH_library.calcB(beta,np.array([colat_SUL*np.pi/180.0]),np.array([lon_SUL*np.pi/180.0]),r_a,r_a)
+    g10_VGPlat_ev_opt[it] = beta[0,2]
+    incl_ev_VGPlat_opt[it] = np.arctan(np.divide(-Br_a,np.sqrt(Bt_a**2 + Bp_a**2)))*180/np.pi
+
+subs.show_flow_streamlines(folder_timestep+'/',0,r_c,r_a,r'$ mT$',90-colat_SUL,lon_SUL)
+subs.show_flow_streamlines(folder_timestep+'/',1,r_c,r_a,r'$ mT$',90-colat_SUL,lon_SUL)
+subs.show_flow_streamlines(folder_timestep+'/',2,r_c,r_a,r'$ mT$',90-colat_SUL,lon_SUL)
+subs.show_flow_streamlines(folder_timestep+'/',3,r_c,r_a,r'$ mT$',90-colat_SUL,lon_SUL)
+
+
+
+
 ###############################
 # OPTIMAL REVERSAL TIMES, IMMAB4
 # optimise g10 
@@ -358,10 +407,11 @@ SCALE_FACTOR = 5e-2
 RESTRICTION  = 0
 ETA          = 0 
 FLAG         = 4
+REVERSE=0
 
 
  
-folder_test = 'IMMAB4_770.9_max_g10'
+folder_test = 'IMMAB4_781.8_max_g10'
 # prepare the input file
 subs.write_optimal_flow_input("input_opt",colat_SUL,lon_SUL,LMAX_U,LMAX_B_OBS,MODEL,TARGET_RMS,SCALE_FACTOR,RESTRICTION,ETA,FLAG)
 # run the fortran code
@@ -389,7 +439,7 @@ fopt.close()
 g10_dot = float(line)
 
 FLOW = folder_test+'/OPTIMAL_FLOW.DAT'
-REVERSE=1
+
 
 
 ################################################################
@@ -402,8 +452,9 @@ ALPHA   = 0.6
 T0      = 0
 TF      = 400
 DT      = 1
+REVERSE=1
 
-folder_timestep = 'IMMAB4_770.9_max_g10_timestep_dt1'
+folder_timestep = 'IMMAB4_781.8_max_g10_timestep_dt1'
 # prepare the input file
 subs.write_timesteping_input("input_timestepping_CMB",LMAX_U,LMAX_B_OBS,FLOW,MODEL,ETA,ALPHA,T0,TF,DT,REVERSE)
 # run the timestepping fortran code
@@ -428,7 +479,7 @@ coeffs_SV_g10_evolved = subs.read_MF_file(folder_timestep+'/SV_COEFFS.DAT')
 # Optimal g10, timestepping/opt 
 ################################################################
 
-folder_timestep = 'IMMAB4_770.9_max_g10_timestep_opt_dt1'
+folder_timestep = 'IMMAB4_781.8_max_g10_timestep_opt_dt1'
 
 FLAG_U_INIT     = 1
 OUT_RATE        = 1
@@ -472,7 +523,7 @@ FLAG         = 0
 
 
  
-folder_test = 'IMMAB4_770.9_max_dipole_tilt'
+folder_test = 'IMMAB4_781.8_max_dipole_tilt'
 # prepare the input file
 subs.write_optimal_flow_input("input_opt",colat_SUL,lon_SUL,LMAX_U,LMAX_B_OBS,MODEL,TARGET_RMS,SCALE_FACTOR,RESTRICTION,ETA,FLAG)
 # run the fortran code
@@ -515,7 +566,7 @@ T0      = 0
 TF      = 400
 DT      = 1
 
-folder_timestep = 'IMMAB4_770.9_max_dipole_tilt_timestep_dt1'
+folder_timestep = 'IMMAB4_781.8_max_dipole_tilt_timestep_dt1'
 # prepare the input file
 subs.write_timesteping_input("input_timestepping_CMB",LMAX_U,LMAX_B_OBS,FLOW,MODEL,ETA,ALPHA,T0,TF,DT,REVERSE)
 # run the timestepping fortran code
@@ -539,7 +590,7 @@ coeffs_SV_tilt_evolved = subs.read_MF_file(folder_timestep+'/SV_COEFFS.DAT')
 # Optimal dipole tilt , timestepping/opt 
 ################################################################
 
-folder_timestep = 'IMMAB4_770.9_max_dipole_tilt_timestep_opt_dt1'
+folder_timestep = 'IMMAB4_781.8_max_dipole_tilt_timestep_opt_dt1'
 
 FLAG_U_INIT     = 1
 OUT_RATE        = 1
@@ -652,6 +703,8 @@ ax_i.plot(t_init-times_incl_columnar_ev_opt,incl_columnar_ev_opt,'--',color='r',
           label='timestepping/optimisation, columnar'  )
 ax_i.plot(t_init-times_incl_toroidal_ev_opt,incl_toroidal_ev_opt,'-.',color='r',
           label='timestepping/optimisation, toroidal'  )
+ax_i.plot(t_init-times_VGPlat_ev_opt,incl_ev_VGPlat_opt,color='k',
+          label='timestepping/optimisation, optimal VGP latitude'  )
 plt.xlabel('Time / yr')
 plt.ylabel('Inclination / $^\circ$')
 # highlight the reversal instant
@@ -676,6 +729,8 @@ ax_i.plot(t_init-times_incl_columnar_ev_opt,g10_incl_columnar_ev_opt,'--',color=
           label='timestepping/optimisation, columnar'  )
 ax_i.plot(t_init-times_incl_toroidal_ev_opt,g10_incl_toroidal_ev_opt,'-.',color='r',
           label='timestepping/optimisation, toroidal'  )
+ax_i.plot(t_init-times_VGPlat_ev_opt,g10_VGPlat_ev_opt,color='k',
+          label='timestepping/optimisation, optimal VGP latitude'  )
 plt.xlabel('Time / yr')
 plt.ylabel('g10 / mT')
 # highlight the reversal instant
