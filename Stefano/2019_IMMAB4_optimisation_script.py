@@ -25,6 +25,7 @@ import matplotlib.pyplot as plt
 import cartopy.crs as ccrs
 from mpl_toolkits.basemap import Basemap
 
+plt.close('all')
 
 ######################################################
 # define the grid for plotting, interpolating and such
