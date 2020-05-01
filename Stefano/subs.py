@@ -18,6 +18,7 @@ from SH_library import DthSchmidtSH
 from SH_library import DphSchmidtSH
 from SH_library import SchmidtSH
 from SH_library import mat2linCoeffs
+from SH_library import calcB
 from matplotlib.ticker import ScalarFormatter
 from matplotlib import rc
 import math
@@ -394,6 +395,223 @@ def show_flow_global(folder):
     plt.close('all')
     return;
 
+
+def show_flow_global(folder):
+    '''
+    show quiver plot superimposed to intensity plot of the velocity fields from the files of the kind
+    FLOWS_VECTORS_RANDOM.DAT
+    OPTIMAL_FLOW.DAT
+    '''
+    input_file = folder+'FLOW_VECTORS_RANDOM.DAT'
+    output_file = folder+'flow_mollweide.pdf'
+    
+    X,Y,U,V = np.loadtxt(input_file,unpack=True)
+    
+    # display max flow on input grid
+    USQ = []
+    for i in range(len(U)):
+        USQ.append( ( U[i]**2 + V[i]**2 )**0.5 )
+    print ('Largest value of |u| on grid is ', max(USQ))
+    long = X
+    lat = Y
+    
+    plt.figure(1, figsize=(10,8))
+    
+    
+    #Mollweide projectionfrom scipy.interpolate import griddata
+    map1 = Basemap(projection='moll',lat_0=0,lon_0=0,resolution='l')
+    
+    # draw coastlines, country boundaries, fill continents.
+    map1.drawcoastlines(linewidth=0.50)
+    
+    # draw lat/lon grid lines every 30 degrees.
+    map1.drawmeridians(np.arange(0,360,30),linewidth=1)
+    map1.drawparallels(np.arange(-90,90,30),linewidth=1)
+    
+    # contourf of the module
+    ##############################
+    # from interpolation of the vectors in input_file, probably not the best
+    
+    # define the grid
+    grid_x, grid_y = np.mgrid[0:360:200j, 90:-90:400j] # original. Bit weird
+    #grid_x, grid_y = np.mgrid[0:360:200j, 0:180:400j]
+    
+    xg, yg = map1(grid_x, grid_y)
+    
+    
+    XY = np.transpose([X,Y])
+    U_grid = griddata(XY, U, (grid_x, grid_y), method='cubic')
+    V_grid = griddata(XY, V, (grid_x, grid_y), method='cubic')
+    
+    #cf=map1.contourf(xg,yg,np.sqrt(U_grid**2 + V_grid**2), 20, cmap = 'Blues')
+    #plt.colorbar(cf,fraction=0.03, pad=0.04)
+    
+    #################################
+    # from the coefficients, probably best
+    Ucoeffs = open(folder+'OPTIMAL_FLOW.DAT', 'r')
+    header = Ucoeffs.readline()
+    lmaxU, lmaxB = [int(s) for s in header.split() if s.isdigit()]
+    line = []
+    coeffs_U = []
+    while True:
+        line = Ucoeffs.readline()
+        x = [list(map(float, line.split() ))]
+        l = x[0][0]
+        m = x[0][1]
+        coeffs_U = np.append(coeffs_U,x)
+        if m == lmaxU: break # end of file
+    
+    coeffs_U = np.reshape(coeffs_U,(len(coeffs_U)/6, 6)) # 6 elements/row : l,m,s_{lm}^{cos},s_{lm}^{sin},t_{lm}^{cos},t_{lm}^{sin}
+    
+    Ucoeffs.close()
+    
+    # define the grid
+    lats = np.linspace(np.pi/2,-np.pi/2,num=100)
+    lons = np.linspace(-np.pi,np.pi,num=100)
+    lats, lons = np.meshgrid(lats,lons)
+    lats = np.transpose(lats)
+    lons = np.transpose(lons)
+    theta = -lats+np.pi/2
+    
+    Ush = np.zeros(theta.shape) # u_th
+    Vsh = np.zeros(theta.shape) # u_ph
+    r_cmb = 3485.0e3
+    
+    for ic in range(len(coeffs_U)):
+        l, m, slm_c, slm_s, tlm_c, tlm_s = coeffs_U[ic][0:6]
+        dthSH_c = DthSchmidtSH(l,m,theta,lons,'c')
+        dthSH_s = DthSchmidtSH(l,m,theta,lons,'s')
+        dphSH_c = DphSchmidtSH(l,m,theta,lons,'c')
+        dphSH_s = DphSchmidtSH(l,m,theta,lons,'s')
+        
+        Ush = Ush + tlm_c * np.divide(dphSH_c,np.sin(theta))  \
+                  + tlm_s * np.divide(dphSH_s,np.sin(theta))  \
+                  + slm_c * dthSH_c  \
+                  + slm_s * dthSH_s  
+    
+        Vsh = Vsh - tlm_c * dthSH_c / r_cmb \
+                  - tlm_s * dthSH_s / r_cmb \
+                  + slm_c * np.divide(dphSH_c,np.sin(theta))  \
+                  + slm_s * np.divide(dphSH_s,np.sin(theta)) 
+        
+    # adjust the units
+    Ush = Ush * r_cmb * 1e-3
+    Vsh = Vsh * r_cmb * 1e-3 
+    speed = np.sqrt(Ush**2 + Vsh**2)
+        
+    xs, ys = map1(lons*180./np.pi, lats*180./np.pi)
+    cs = map1.contourf(xs,ys,speed, cmap='Blues')
+    plt.colorbar(cs,fraction=0.03, pad=0.04)
+    
+    
+    #####################
+    # quiver of the flow
+    # make up some data on a regular lat/lon grid.
+    uproj,vproj,xx,yy = \
+    map1.rotate_vector(np.array(V),-np.array(U),np.array(long),np.array(lat),returnxy=True)
+    
+    
+    for i in range(0,len(xx)):
+        Q = map1.quiver(xx[i],yy[i],uproj[i],vproj[i],angles='uv',pivot='tail',scale=600,width=0.002,headwidth=6)
+    plt.rcParams['font.size'] = 18
+    plt.quiverkey(Q,0.5,-0.2, 20,'20 km/yr',coordinates='axes')
+    
+    plt.savefig(output_file, bbox_inches='tight',pad_inches=0.7,dpi=400)
+
+    plt.close()
+    return;
+    
+def show_flow_Br_global(folder,model,r_cmb,r_a,LMAX_B_OBS,hline_B,time,units,colatS,lonS):
+    '''
+    show quiver plot superimposed to intensity plot of the velocity fields from the files of the kind
+    FLOWS_VECTORS_RANDOM.DAT
+    OPTIMAL_FLOW.DAT
+    Superimpose do a snapshot of a magnetic field model provided in the file 
+    model
+    '''
+    input_file = folder+'FLOW_VECTORS_RANDOM.DAT'
+    output_file = folder+'flow_Br_mollweide.pdf'
+    
+    
+    
+    # load magnetic field
+    coeffsBmat = read_coeffs(model,hline_B,LMAX_B_OBS)
+    
+    
+    lats = np.linspace(np.pi/2,-np.pi/2,num=100)
+    lons = np.linspace(-np.pi,np.pi,num=100)
+    lats, lons = np.meshgrid(lats,lons)
+    lats = np.transpose(lats)
+    lons = np.transpose(lons)
+    theta = -lats+np.pi/2
+    
+    Br, Bt, Bp = calcB(coeffsBmat,theta,lons,r_a,r_cmb)    
+    
+    
+    X,Y,U,V = np.loadtxt(input_file,unpack=True)
+    
+    # display max flow on input grid
+    USQ = []
+    for i in range(len(U)):
+        USQ.append( ( U[i]**2 + V[i]**2 )**0.5 )
+    print ('Largest value of |u| on grid is ', max(USQ))
+    long = X
+    lat = Y
+    
+    plt.figure(1, figsize=(10,8))
+    
+    
+    #Mollweide projectionfrom scipy.interpolate import griddata
+    map1 = Basemap(projection='moll',lat_0=0,lon_0=0,resolution='l')
+    
+    # draw coastlines, country boundaries, fill continents.
+    map1.drawcoastlines(linewidth=0.50)
+    
+    # draw lat/lon grid lines every 30 degrees.
+    map1.drawmeridians(np.arange(0,360,30),linewidth=1)
+    map1.drawparallels(np.arange(-90,90,30),linewidth=1)
+    
+    # contourf of the module
+    ##############################
+    # from interpolation of the vectors in input_file, probably not the best
+    
+    # define the grid
+    #grid_x, grid_y = np.mgrid[0:360:200j, 90:-90:400j] # original. Bit weird
+    #grid_x, grid_y = np.mgrid[0:360:200j, 0:180:400j]
+    
+    #xg, yg = map1(grid_x, grid_y)
+
+    xs, ys = map1(lons*180./np.pi, lats*180./np.pi)
+    cs = map1.contourf(xs,ys,Br/1000., cmap='coolwarm')
+    plt.colorbar(cs,fraction=0.03, pad=0.04)
+    plt.text(42000000, 8500000, units , fontsize=16)
+
+    
+    #####################
+    # quiver of the flow
+    # make up some data on a regular lat/lon grid.
+    uproj,vproj,xx,yy = \
+    map1.rotate_vector(np.array(V),-np.array(U),np.array(long),np.array(lat),returnxy=True)
+    
+    
+    for i in range(0,len(xx)):
+        Q = map1.quiver(xx[i],yy[i],uproj[i],vproj[i],angles='uv',pivot='tail',scale=600,width=0.002,headwidth=6)
+    plt.rcParams['font.size'] = 18
+    plt.quiverkey(Q,0.5,-0.2, 20,'20 km/yr',coordinates='axes')
+    
+    #station location
+    xS, yS = map1(lonS, colatS)
+    if colatS != None:
+        map1.scatter(xS,yS,
+                    s=80,edgecolor='k',color='w',alpha=1, zorder=3,marker='^')
+        
+    plt.savefig(output_file, bbox_inches='tight',pad_inches=0.7,dpi=400)
+
+    plt.close()
+    return;    
+    
+    
+    
 def show_flow_streamlines(folder,it,r_cmb,r_a,units,colatS,lonS):
     '''
     plot flows and CMB field from the data stored in the output of the timestepping/optimisation routines:
@@ -518,7 +736,8 @@ def show_flow_streamlines(folder,it,r_cmb,r_a,units,colatS,lonS):
                 m=0
                 
                 
-    F_a = np.sqrt(Br_a**2 + Bt_a**2 + Bp_a**2)        
+    F_a = np.sqrt(Br_a**2 + Bt_a**2 + Bp_a**2) 
+    Incl = np.rad2deg(np.arctan(-Br_a/np.sqrt(Bt_a**2 + Bp_a**2)))     
     Ush = Ush * r_cmb * 1e-3
     Vsh = Vsh * r_cmb * 1e-3 
     speed = np.sqrt(Ush**2 + Vsh**2)
@@ -572,7 +791,7 @@ def show_flow_streamlines(folder,it,r_cmb,r_a,units,colatS,lonS):
     
     # Surface intensity
     
-    it = 0
+
     files = []
     
     figF = plt.figure(figsize=(11, 6))
@@ -629,6 +848,40 @@ def show_flow_streamlines(folder,it,r_cmb,r_a,units,colatS,lonS):
     
     plt.title(U_pol_coeffs[0], y=1.08)
     fname = folder +'U_CMB_%07d.png' % it
+    plt.savefig(fname,  bbox_inches='tight',pad_inches=0.7,dpi=400)
+    files.append(fname)
+    plt.close()
+
+    # flow inclination at surface
+    #sinlge plot
+    files = []
+    
+    figI = plt.figure(figsize=(11, 6))
+    #    plt.cla()
+    axI = figI.add_subplot(1, 1, 1, projection=ccrs.Mollweide())
+    #axU.gridlines(linewidth=1, alpha=0.5, linestyle='-')
+    
+    cf = axI.contourf(lons, lats, Incl, # breaks down with contourlevels >=24
+                transform=ccrs.PlateCarree(),
+                cmap='viridis',vmin=-90.0, vmax=90.0)
+    axI.contour(lons, lats, Incl,23, 
+                transform=ccrs.PlateCarree(),
+                colors='k',linewidths=0.5,alpha = 0.3,linestyles = 'solid')
+    
+    #v = np.linspace(-90.0, 2.0, 90.0)
+    plt.colorbar(cf,fraction=0.03, pad=0.04)
+    plt.text(23000000, 0, 'deg' , fontsize=16)
+
+    axI.coastlines()
+    axI.set_global()
+    #station location
+    if colatS != None:
+        axI.scatter(lonS,colatS,
+                   s=80,edgecolor='k',color='w',alpha=1, zorder=3,marker='^',
+                   transform=ccrs.PlateCarree())
+    
+    plt.title(U_pol_coeffs[0], y=1.08)
+    fname = folder +'Incl_%07d.png' % it
     plt.savefig(fname,  bbox_inches='tight',pad_inches=0.7,dpi=400)
     files.append(fname)
     plt.close()

@@ -82,7 +82,8 @@ os.system('mv *DAT '+folder_test)
 
 # plot the flow
 #subs.show_flow(folder_test+"/")
-#subs.show_flow_global(folder_test+"/")
+subs.show_flow_global(folder_test+"/")
+subs.show_flow_Br_global(folder_test+"/",MODEL,r_c,r_a,LMAX_B_OBS,1,t_init/1000.,r'$ mT$',90-colat_SUL,lon_SUL)
 subs.show_flow_streamlines_inst(folder_test,folder_test+'/OPTIMAL_FLOW.DAT',MODEL,r_c,r_a,LMAX_U,1,LMAX_B_OBS,1,t_init/1000.,r'$ mT$',90-colat_SUL,lon_SUL)
 
 
@@ -126,7 +127,6 @@ if U_file == []:
     os.system('mv *DAT '+folder_test)
 
 
-
 ###############################
 # OPTIMAL INCLINATION, IMMAB4
 # optimise I, max instantaneous
@@ -145,8 +145,10 @@ os.system('mv *DAT '+folder_test)
 
 # plot the flow
 #subs.show_flow(folder_test+"/")
-#subs.show_flow_global(folder_test+"/")
-subs.show_flow_streamlines_inst(folder_test,folder_test+'/OPTIMAL_FLOW.DAT',MODEL,r_c,r_a,LMAX_U,1,LMAX_B_OBS,1,t_init/1000.,r'$ mT$',90-colat_SUL,lon_SUL)
+subs.show_flow_global(folder_test+"/")
+subs.show_flow_Br_global(folder_test+"/",MODEL,r_c,r_a,LMAX_B_OBS,1,777.4,r'$ mT$',90-colat_SUL,lon_SUL)
+
+subs.show_flow_streamlines_inst(folder_test,folder_test+'/OPTIMAL_FLOW.DAT',MODEL,r_c,r_a,LMAX_U,1,LMAX_B_OBS,1,777.4,r'$ mT$',90-colat_SUL,lon_SUL)
 
 
 
@@ -231,6 +233,9 @@ for it in range(coeffs_MF_incl_evolved_opt.shape[0]):
     incl_ev_opt[it] = np.arctan(np.divide(-Br_a,np.sqrt(Bt_a**2 + Bp_a**2)))*180/np.pi
 
 subs.show_flow_streamlines(folder_timestep+'/',0,r_c,r_a,r'$ mT$',90-colat_SUL,lon_SUL)
+subs.show_flow_streamlines(folder_timestep+'/',29,r_c,r_a,r'$ mT$',90-colat_SUL,lon_SUL)
+subs.show_flow_streamlines(folder_timestep+'/',54,r_c,r_a,r'$ mT$',90-colat_SUL,lon_SUL)
+
 
 
 ################################################################
@@ -541,6 +546,7 @@ if U_file == []:
 # plot the flow
 subs.show_flow(folder_test+"/")
 subs.show_flow_global(folder_test+"/")
+subs.show_flow_Br_global(folder_test+"/",MODEL,r_c,r_a,LMAX_B_OBS,1,t_init/1000.,r'$ mT$',90-colat_SUL,lon_SUL)
 subs.show_flow_streamlines_inst(folder_test,folder_test+'/OPTIMAL_FLOW.DAT',MODEL,r_c,r_a,LMAX_U,1,LMAX_B_OBS,1,t_init/1000.,r'$ mT$',90-colat_SUL,lon_SUL)
 
 # read in the optimal inclination
@@ -622,6 +628,10 @@ colatitude_tilt_ev_opt = -(90.0 - 180/np.pi * np.arccos(np.divide(g10,md)))
 
 g10_tilt_ev_opt   = coeffs_MF_tilt_evolved_opt[:,1]
 
+subs.show_flow_streamlines(folder_timestep+'/',0,r_c,r_a,r'$ mT$',90-colat_SUL,lon_SUL)
+subs.show_flow_streamlines(folder_timestep+'/',206,r_c,r_a,r'$ mT$',90-colat_SUL,lon_SUL)
+subs.show_flow_streamlines(folder_timestep+'/',380,r_c,r_a,r'$ mT$',90-colat_SUL,lon_SUL)
+subs.show_flow_streamlines(folder_timestep+'/',400,r_c,r_a,r'$ mT$',90-colat_SUL,lon_SUL)
 
 ################
 # Plots

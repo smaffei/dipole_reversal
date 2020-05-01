@@ -1025,7 +1025,7 @@ leg1=ax.legend([(lt1), (l1, l6),(l2, l4, l5, l7)], [lt1._label, l1._label,l2._la
                fontsize=LFS,loc='upper left')
 
 
-leg2=ax.legend([(lt2), (l1,l2), (l4), (l5), (l6,l7,l8)], [lt2._label, 'SH models','data','contested data','optimal solution'], numpoints=1,
+leg2=ax.legend([(lt2), (l1,l2), (l4), (l5), (l6,l7)], [lt2._label, 'SH models','data','contested data','optimal solution'], numpoints=1,
                handler_map={tuple: HandlerTuple(ndivide=None)},
                fontsize=LFS,
 #               loc=(0.011, 0.63),
